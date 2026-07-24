@@ -1,0 +1,9 @@
+flask
+python-docx
+pypdf
+pydantic
+google-genai
+xhtml2pdf
+python-dotenv
+groq
+PyMuPDF

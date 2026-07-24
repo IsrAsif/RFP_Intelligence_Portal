@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFP Analysis Results</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .header {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 20px 24px; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-left .back-btn {
+            text-decoration: none; color: var(--text-secondary);
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; transition: all var(--transition);
+        }
+        .header-left .back-btn:hover { background: var(--primary-light); color: var(--primary); }
+        .header-left .title-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .header-left .analysis-title { font-size: 18px; font-weight: 700; color: var(--text); }
+        .header-left .file-badge {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            background: var(--bg); padding: 4px 10px; border-radius: 100px;
+        }
+
+        .search-bar {
+            max-width: 1100px; margin: 16px auto 0; position: relative;
+        }
+        .search-bar input {
+            width: 100%; padding: 10px 16px 10px 40px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--bg); color: var(--text); font-size: 14px;
+            font-family: inherit; outline: none; transition: all var(--transition);
+        }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .search-bar .search-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+        .summary-banner {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow);
+        }
+        .summary-banner .sb-head {
+            font-size: 14px; font-weight: 600; color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .summary-banner p { font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+
+        .tabs-wrapper { position: relative; margin-bottom: 24px; }
+        .tabs-wrap-inner { position: relative; }
+        .tabs {
+            display: flex; gap: 4px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 4px; overflow-x: auto;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .tabs::-webkit-scrollbar { height: 0; transition: height 0.25s ease; }
+        .tabs:hover::-webkit-scrollbar { height: 5px; }
+        .tabs::-webkit-scrollbar-track { background: transparent; }
+        .tabs::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.35); border-radius: 3px; }
+        .tabs::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.55); }
+        .tabs-fade {
+            position: absolute; top: 0; right: 0; bottom: 0;
+            width: 48px;
+            background: linear-gradient(to right, transparent, var(--surface));
+            pointer-events: none; z-index: 1;
+            opacity: 0; transition: opacity 0.3s ease;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .tabs-fade.show { opacity: 1; }
+        .tab-scroll-arrow {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-secondary); cursor: pointer; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: all 0.25s ease; box-shadow: var(--shadow);
+            font-size: 14px; font-weight: 700; font-family: inherit; line-height: 1;
+            padding: 0;
+        }
+        .tab-scroll-arrow.visible { opacity: 1; }
+        .tab-scroll-arrow:hover { background: rgba(124, 58, 237, 0.12); color: #7c3aed; border-color: #7c3aed; }
+        .tab-scroll-arrow:active { transform: translateY(-50%) scale(0.92); }
+        .tab-btn {
+            padding: 10px 20px; border: none; background: transparent;
+            color: var(--text-secondary); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            transition: all var(--transition); white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .tab-btn:hover { background: var(--bg); color: var(--text); }
+        .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
+        .tab-btn .count {
+            font-size: 11px; background: rgba(255,255,255,0.2);
+            padding: 1px 7px; border-radius: 100px;
+        }
+        .tab-btn.active .count { background: rgba(255,255,255,0.25); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow);
+        }
+        .section-card h3 {
+            font-size: 15px; font-weight: 600; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-card .list { list-style: none; }
+        .section-card .list li {
+            padding: 10px 14px; background: var(--bg); border-radius: 8px;
+            margin-bottom: 6px; font-size: 14px; line-height: 1.5;
+            color: var(--text-secondary); border-left: 3px solid var(--primary);
+            transition: all var(--transition);
+        }
+        .section-card .list li:hover { transform: translateX(4px); box-shadow: var(--shadow); }
+
+        /* ===== TREE VIEW FOR DELIVERABLES ===== */
+        .tree { list-style: none; padding: 0; margin: 0; }
+        .tree-parent {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+            box-shadow: var(--shadow); transition: all var(--transition);
+        }
+        .tree-parent-label {
+            padding: 12px 16px; font-weight: 700; font-size: 14px;
+            color: var(--text); background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; user-select: none;
+            transition: background var(--transition);
+        }
+        .tree-parent-label:hover { background: var(--primary-light); }
+        .tree-parent-label .toggle-icon {
+            width: 16px; height: 16px; flex-shrink: 0;
+            color: var(--text-muted); transition: transform 0.2s ease;
+        }
+        .tree-parent.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .tree-parent-label .parent-accent {
+            width: 4px; height: 20px; border-radius: 2px;
+            background: var(--primary); flex-shrink: 0;
+        }
+        .tree-parent-label .label-text { flex: 1; }
+        .tree-children {
+            list-style: none; padding: 0; margin: 0;
+            transition: all 0.2s ease;
+        }
+        .tree-parent.collapsed .tree-children { display: none; }
+        .tree-ref, .tree-child-ref {
+            font-size: 10px; line-height: 1.4; margin: 4px 0 6px 36px; padding: 5px 8px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+            display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center;
+            max-width: 92%; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .tree-child-ref { margin-left: 58px; }
+        .tree-ref .ref-file, .tree-child-ref .ref-file {
+            display: inline-block; background: var(--primary-light); color: var(--primary);
+            font-weight: 700; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-sec, .tree-child-ref .ref-sec {
+            display: inline-block; background: #ecfdf5; color: #059669;
+            font-weight: 600; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-page, .tree-child-ref .ref-page {
+            display: inline-block; background: #fffbeb; color: #d97706;
+            font-weight: 600; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-desc, .tree-child-ref .ref-desc {
+            display: inline-block; color: var(--text-muted); font-size: 9px;
+            padding: 1px 4px;
+        }
+        .tree-child {
+            padding: 6px 12px 6px 36px; font-size: 13px;
+            color: var(--text-secondary); line-height: 1.5;
+            position: relative;
+        }
+        .tree-child:hover {
+            color: var(--text); background: var(--bg);
+        }
+        /* L-shape branch: vertical line down + horizontal arm */
+        .tree-child::before {
+            content: '';
+            position: absolute; left: 16px; top: 0;
+            width: 12px; height: 13px;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        /* Vertical continuation below L-shape for non-last children */
+        .tree-child::after {
+            content: '';
+            position: absolute; left: 16px; top: 13px;
+            bottom: 0; width: 1px;
+            background: var(--border);
+        }
+        .tree-child:last-child::after { display: none; }
+        .section-card .empty-state {
+            text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px;
+        }
+
+        .risk-card {
+            padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 8px;
+            border-left: 4px solid; display: flex; align-items: flex-start; gap: 12px;
+        }
+        .risk-card.severity-high { background: var(--red-light); border-color: var(--red); }
+        .risk-card.severity-medium { background: var(--amber-light); border-color: var(--amber); }
+        .risk-card.severity-low { background: var(--green-light); border-color: var(--green); }
+        .risk-card .risk-severity {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+        }
+        .risk-card.severity-high .risk-severity { background: var(--red); color: #fff; }
+        .risk-card.severity-medium .risk-severity { background: var(--amber); color: #fff; }
+        .risk-card.severity-low .risk-severity { background: var(--green); color: #fff; }
+        .risk-card .risk-category { font-weight: 600; font-size: 14px; }
+        .risk-card .risk-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .risk-card .risk-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+        .timeline-item {
+            display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .timeline-item:last-child { border-bottom: none; }
+        .timeline-item .tl-dot {
+            width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
+            margin-top: 4px; flex-shrink: 0; box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        .timeline-item .tl-milestone { font-weight: 600; font-size: 14px; }
+        .timeline-item .tl-date { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .compliance-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;
+        }
+        .compliance-card {
+            padding: 18px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: var(--bg);
+            transition: all var(--transition);
+        }
+        .compliance-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .compliance-card .cc-title {
+            font-weight: 600; font-size: 14px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .compliance-card .cc-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        .key-req-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .key-req-item:last-child { border-bottom: none; }
+        .key-req-item .kr-num {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .key-req-item .kr-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+
+
+        @media (max-width: 768px) {
+            .header { padding: 14px 16px; }
+            .header-left h1 { font-size: 15px; }
+            .main { padding: 16px; }
+            .compliance-grid { grid-template-columns: 1fr; }
+            .tab-btn { padding: 8px 14px; font-size: 13px; }
+        }
+
+        /* ===== GO / NO-GO TAB ===== */
+        .go-score-wrap {
+            display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+        }
+        .go-gauge {
+            position: relative; width: 140px; height: 140px; flex-shrink: 0;
+        }
+        .go-gauge svg { transform: rotate(-90deg); }
+        .go-gauge .track { fill: none; stroke: var(--border); stroke-width: 8; }
+        .go-gauge .arc {
+            fill: none; stroke-width: 8; stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease;
+        }
+        .go-gauge-label {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .go-gauge-label .pct { font-size: 32px; font-weight: 800; line-height: 1; }
+        .go-gauge-label .pct-label {
+            font-size: 11px; color: var(--text-muted); margin-top: 2px;
+        }
+        .go-verdict {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 14px; border-radius: 100px; font-size: 13px; font-weight: 700;
+        }
+        .go-verdict.go { background: var(--green-light); color: var(--green); }
+        .go-verdict.caution { background: var(--amber-light); color: var(--amber); }
+        .go-verdict.nogo { background: var(--red-light); color: var(--red); }
+        .go-summary { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-top: 4px; flex: 1; }
+        .go-reasons { margin-top: 20px; }
+        .go-reason {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 8px;
+            border-left: 3px solid; background: var(--bg);
+        }
+        .go-reason .gr-icon { flex-shrink: 0; margin-top: 1px; }
+        .go-reason .gr-icon .icon { width: 18px; height: 18px; }
+        .go-reason .gr-body { flex: 1; }
+        .go-reason .gr-body .gr-factor {
+            font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;
+        }
+        .go-reason .gr-body .gr-detail { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .go-reason .gr-weight {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            padding: 1px 6px; border-radius: 100px;
+        }
+        .go-reason .gr-weight.high { background: var(--red-light); color: var(--red); }
+        .go-reason .gr-weight.medium { background: var(--amber-light); color: var(--amber); }
+        .go-reason .gr-weight.low { background: var(--green-light); color: var(--green); }
+
+        /* ===== STRATEGIC CHECKLIST ===== */
+        .sc-exec {
+            font-size: 15px; line-height: 1.7; color: var(--text-secondary);
+            background: var(--bg); border-radius: var(--radius-sm); padding: 16px;
+        }
+        .sc-section { border-left: 3px solid var(--primary); }
+        .sc-items { display: flex; flex-direction: column; gap: 8px; }
+        .sc-item {
+            background: var(--bg); border-radius: 8px; padding: 12px 16px;
+            border-left: 3px solid var(--border); transition: all var(--transition);
+        }
+        .sc-item:hover { transform: translateX(4px); box-shadow: var(--shadow); }
+        .sc-item-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+        }
+        .sc-item-name { font-weight: 600; font-size: 14px; color: var(--text); }
+        .sc-item-reason { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+        .sc-badge {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 2px 10px; border-radius: 100px; letter-spacing: 0.3px;
+        }
+        .sc-badge.go { background: var(--green-light); color: var(--green); }
+        .sc-badge.no-go { background: var(--red-light); color: var(--red); }
+        .sc-badge.escalate { background: var(--amber-light); color: var(--amber); }
+        .sc-badge.review { background: #eef2ff; color: var(--primary); }
+        .sc-badge.caution { background: var(--amber-light); color: var(--amber); }
+        .sc-badge.not-specified-in-rfp { background: var(--border); color: var(--text-muted); }
+        .sc-detail { font-size: 13px; line-height: 1.6; margin-top: 8px; padding: 10px 12px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+        .sc-detail-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .sc-detail-label .icon { width: 14px; height: 14px; }
+        .sc-detail-text { color: var(--text-secondary); }
+        .sc-detail + .sc-detail { margin-top: 6px; }
+        .sc-rec { border-left: 3px solid var(--primary); }
+        .sc-analysis { border-left: 3px solid var(--amber); }
+        .sc-rfp-says { border-left: 3px solid var(--text-muted); }
+        .sc-evidence { border-left: 3px solid var(--green); }
+        .sc-risk { border-left: 3px solid var(--red); }
+        .sc-impact { border-left: 3px solid var(--amber); }
+        .sc-mitigation { border-left: 3px solid var(--primary); }
+        .deliv-toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .deliv-toc-head {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .deliv-toc-stats {
+            display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .deliv-toc-stat {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--text-secondary);
+        }
+        .deliv-toc-stat strong { font-size: 18px; color: var(--text); font-weight: 800; }
+        .deliv-toc-bar {
+            width: 160px; height: 8px; background: var(--border);
+            border-radius: 100px; overflow: hidden; position: relative;
+        }
+        .deliv-toc-bar-fill {
+            height: 100%; border-radius: 100px;
+            background: linear-gradient(90deg, var(--green), #22c55e);
+            transition: width 0.6s ease;
+        }
+        .deliv-toc-anchors {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+            padding-top: 12px; border-top: 1px solid var(--border);
+        }
+        .deliv-toc-anchors a {
+            font-size: 12px; font-weight: 500; color: var(--primary);
+            text-decoration: none; padding: 4px 10px; border-radius: 100px;
+            background: var(--primary-light); transition: all var(--transition);
+        }
+        .deliv-toc-anchors a:hover { background: var(--primary); color: #fff; }
+        .risk-tag {
+            display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 1px 8px; border-radius: 100px; letter-spacing: 0.3px; margin-left: 4px;
+        }
+        .risk-tag.high { background: var(--red-light); color: var(--red); }
+        .risk-tag.medium { background: var(--amber-light); color: var(--amber); }
+        .risk-tag.low { background: var(--green-light); color: var(--green); }
+        .sc-summary { border-left: 3px solid var(--primary); margin-bottom: 16px; }
+        .sc-summary-grid {
+            display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+        }
+        .sc-summary-item {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 12px 20px; border-radius: 10px; min-width: 90px;
+            background: var(--bg); border: 1px solid var(--border);
+        }
+        .sc-summary-count {
+            font-size: 28px; font-weight: 800; line-height: 1.1;
+        }
+        .sc-summary-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-top: 4px;
+        }
+        .sc-summary-item.go .sc-summary-count { color: var(--green); }
+        .sc-summary-item.no-go .sc-summary-count { color: var(--red); }
+        .sc-summary-item.review .sc-summary-count { color: var(--primary); }
+        .sc-summary-item.escalate .sc-summary-count { color: var(--amber); }
+        .sc-summary-item.caution .sc-summary-count { color: var(--amber); }
+        .sc-summary-item.not-specified .sc-summary-count { color: var(--text-muted); }
+        .sc-summary-item.go .sc-summary-label { color: var(--green); }
+        .sc-summary-item.no-go .sc-summary-label { color: var(--red); }
+        .sc-summary-item.review .sc-summary-label { color: var(--primary); }
+        .sc-summary-item.escalate .sc-summary-label { color: var(--amber); }
+        .sc-summary-item.caution .sc-summary-label { color: var(--amber); }
+        .sc-summary-item.not-specified .sc-summary-label { color: var(--text-muted); }
+        .sc-detail { border-left: 3px solid var(--border); padding-left: 10px; margin-top: 8px; }
+        .sc-detail.sc-evidence { border-left-color: #10b981; }
+        .sc-detail.sc-rfp-says { border-left-color: #94a3b8; }
+        .sc-detail.sc-risk { border-left-color: #ef4444; }
+        .sc-detail.sc-impact { border-left-color: #f59e0b; }
+        .sc-detail.sc-mitigation { border-left-color: #4f46e5; }
+        .sc-detail.sc-analysis { border-left-color: #f59e0b; }
+        .sc-detail.sc-rec { border-left-color: #4f46e5; }
+    </style>
+</head>
+<body>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon" id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-left">
+                <a href="/" class="back-btn">
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <div>
+                    <div class="title-line">
+                        <svg width="28" height="28" viewBox="0 0 64 64" style="flex-shrink:0">
+                            <defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs>
+                            <rect width="64" height="64" rx="14" fill="url(#lg2)"/>
+                            <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                            <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                            <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="analysis-title">{{ record_title or filename }}</span>
+                        <span class="file-badge">{{ filename }}</span>
+                        <span class="file-badge" style="background:var(--primary-light);color:var(--primary)">{{ provider or 'gemini' }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions" style="display:flex;gap:8px;flex-wrap:wrap">
+                <form action="/export_pdf" method="POST" style="display:inline">
+                    <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                    <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                    <button type="submit" class="btn">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Export PDF
+                    </button>
+                </form>
+                <form action="/export_deliverables_pdf" method="POST" style="display:inline">
+                    <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                    <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                    <button type="submit" class="btn" title="Download deliverables-only PDF with full references">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Deliverables PDF
+                    </button>
+                </form>
+                <form action="/export_json" method="POST" style="display:inline">
+                    <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                    <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                    <button type="submit" class="btn">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Export JSON
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="search-bar">
+            <span class="search-icon">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <input type="text" id="searchInput" placeholder="Search across all sections..." oninput="filterResults(this.value)">
+        </div>
+    </header>
+
+    <div class="main page-enter">
+        <div class="summary-banner">
+            <div class="sb-head">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Executive Summary
+            </div>
+            <p>{{ results.get('summary', 'No summary available.') }}</p>
+        </div>
+
+        {% if results.deliverables and results.deliverables[0] is mapping %}
+        {% set total_parents = results.deliverables | length %}
+        {% set total_children = namespace(v=0) %}
+        {% set ref_children = namespace(v=0) %}
+        {% for g in results.deliverables %}
+            {% if g.sub_deliverables is defined %}
+                {% for c in g.sub_deliverables %}
+                    {% set total_children.v = total_children.v + 1 %}
+                    {% set cr = c.reference if c.reference is defined else c.get('reference', '') %}
+                    {% if cr %}{% set ref_children.v = ref_children.v + 1 %}{% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        {% set pct = (ref_children.v / total_children.v * 100) | int if total_children.v > 0 else 0 %}
+        <div class="deliv-toc">
+            <div class="deliv-toc-head">
+                <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" fill="none"/><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" fill="none"/><line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                Deliverable Summary
+            </div>
+            <div class="deliv-toc-stats">
+                <span class="deliv-toc-stat"><strong>{{ total_parents }}</strong> parent groups</span>
+                <span class="deliv-toc-stat"><strong>{{ total_children.v }}</strong> sub-deliverables</span>
+                <span class="deliv-toc-stat">
+                    <strong>{{ pct }}%</strong> have references
+                    <span class="deliv-toc-bar"><span class="deliv-toc-bar-fill" style="width:{{ pct }}%"></span></span>
+                </span>
+            </div>
+            <div class="deliv-toc-anchors">
+                {% for g in results.deliverables %}
+                {% set pname = g.deliverable if g.deliverable is defined else g.get('deliverable', '') %}
+                <a href="#deliv-{{ loop.index }}">{{ loop.index }}. {{ pname }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% set sa = results.get('sections_analyzed', []) %}
+        {% set sa_display = sa | select('ne', 'summary') | list %}
+        {% if sa_display | length < 8 %}
+        <div class="section-card" style="margin-bottom:16px;padding:12px 20px;border-left:4px solid #f59e0b;display:flex;align-items:center;gap:10px;">
+            <svg class="icon" style="flex-shrink:0;color:#f59e0b" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+            <span style="font-size:13px;color:var(--text-secondary)">Partial analysis: only <strong>{{ sa_display | join(', ') | replace('go_nogo','Go/No-Go') | replace('strategic_checklist','Checklist') | replace('evaluation_criteria','Evaluation') | replace('key_requirements','Key Req.') | replace('deliverables','Deliverables') | replace('compliance','Compliance') | replace('risks','Risks') | replace('timeline','Timeline') }}</strong> were analyzed.</span>
+        </div>
+        {% endif %}
+
+        <div class="tabs-wrapper">
+            <div class="tabs-wrap-inner">
+                <div class="tabs" id="tabContainer">
+            {% if 'deliverables' in sa %}
+            <button class="tab-btn active" data-tab="deliverables">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Deliverables <span class="count">{% if results.deliverables and results.deliverables[0] is mapping %}{% set dcount = results.deliverables | length %}{% set ccount = namespace(v=0) %}{% for d in results.deliverables %}{% if d.sub_deliverables is defined %}{% set ccount.v = ccount.v + d.sub_deliverables | length %}{% endif %}{% endfor %}{{ dcount }} / {{ ccount.v }}{% else %}{{ results.deliverables | length }}{% endif %}</span>
+            </button>
+            {% endif %}
+            {% if 'evaluation_criteria' in sa %}
+            <button class="tab-btn" data-tab="evaluation">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Evaluation <span class="count">{{ results.get('evaluation_criteria', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'compliance' in sa %}
+            <button class="tab-btn" data-tab="compliance">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Compliance
+            </button>
+            {% endif %}
+            {% if 'risks' in sa %}
+            <button class="tab-btn" data-tab="risks">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Risks <span class="count">{{ results.get('risks', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'timeline' in sa %}
+            <button class="tab-btn" data-tab="timeline">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Timeline <span class="count">{{ results.get('timeline', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'key_requirements' in sa %}
+            <button class="tab-btn" data-tab="requirements">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Key Req. <span class="count">{{ results.get('key_requirements', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'strategic_checklist' in sa %}
+            <button class="tab-btn" data-tab="strategic">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Checklist
+            </button>
+            {% endif %}
+            {% if 'go_nogo' in sa %}
+            <button class="tab-btn" data-tab="gonogo">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Go / No-Go <span class="count">{{ results.get('go_nogo', {}).get('score', 0) }}%</span>
+            </button>
+            {% endif %}
+        </div>
+        <div class="tabs-fade" id="tabsFade"></div>
+        <button class="tab-scroll-arrow" id="tabScrollArrow" aria-label="Scroll tabs">&gt;</button>
+        </div>
+        </div>
+
+        {% if 'deliverables' in sa %}
+        <div class="tab-content active" id="tab-deliverables">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Required Deliverables
+                </h3>
+                {% if results.deliverables %}
+                {% if results.deliverables[0] is mapping %}
+                {# New hierarchical format #}
+                <ul class="tree" id="list-deliverables">
+                    {% for group in results.deliverables %}
+                    {% set parent = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+                    {% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+                    {% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+                    {% set outer_idx = loop.index %}
+                    <li class="tree-parent" id="deliv-{{ outer_idx }}" data-search="{{ parent | lower }} {{ children | join(' ') | lower }} {{ ref | lower }}">
+                        <div class="tree-parent-label" onclick="toggleDeliverable(this)">
+                            <svg class="toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="parent-accent"></span>
+                            <span class="label-text">{{ outer_idx }}. {{ parent }}</span>
+                        </div>
+                        {% if ref %}
+                        {% set pg_raw = group.page_number if group.page_number is defined else group.get('page_number', '') %}
+                        {% set rest = ref.split(']') | last %}
+                        {% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+                        {% set parsed_page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+                        {% set page_display = ('p.' + pg_raw|string) if pg_raw else parsed_page %}
+                        {% set desc = rest.split('—') | last if '—' in rest else '' %}
+                        <div class="tree-ref" title="{{ ref }}">
+                            <span class="ref-file">{{ ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ sec | trim }}</span>
+                            {% if page_display %}<span class="ref-page">{{ page_display }}</span>{% endif %}
+                            {% if desc %}<span class="ref-desc">— {{ desc | trim }}</span>{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if children %}
+                        <ul class="tree-children">
+                    {% for child in children %}
+                    {% if child is mapping %}
+                    {% set child_name = child.name if child.name is defined else child.get('name', '') %}
+                    {% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+                    {% else %}
+                    {% set child_name = child %}
+                    {% set child_ref = '' %}
+                    {% endif %}
+                    <li class="tree-child" data-search="{{ outer_idx }}.{{ loop.index }} {{ parent | lower }} {{ child_name | lower }} {{ child_ref | lower }}">{{ outer_idx }}.{{ loop.index }} {{ child_name }}</li>
+                    {% if child_ref %}
+                    {% set cpg_raw = child.page_number if child.page_number is defined else child.get('page_number', '') %}
+                    {% set crest = child_ref.split(']') | last %}
+                    {% set csec = crest.split('p.')[0] if 'p.' in crest else crest.split('—')[0] %}
+                    {% set cparsed_page = 'p.' + crest.split('p.')[1].split('—')[0] | trim if 'p.' in crest else '' %}
+                    {% set cpage_display = ('p.' + cpg_raw|string) if cpg_raw else cparsed_page %}
+                    {% set cdesc = crest.split('—') | last if '—' in crest else '' %}
+                    <li class="tree-child-ref" title="{{ child_ref }}">
+                        <span class="ref-file">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+                        <span class="ref-sec">{{ csec | trim }}</span>
+                        {% if cpage_display %}<span class="ref-page">{{ cpage_display }}</span>{% endif %}
+                        {% if cdesc %}<span class="ref-desc">— {{ cdesc | trim }}</span>{% endif %}
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                {# Old flat format — backward compatibility #}
+                <ul class="list" id="list-deliverables">
+                    {% for item in results.deliverables %}
+                    <li data-search="{{ item | lower }}">{{ loop.index }}. {{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% else %}
+                <div class="empty-state">No deliverables extracted from this document.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'evaluation_criteria' in sa %}
+        <div class="tab-content" id="tab-evaluation">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Evaluation Criteria
+                </h3>
+                {% if results.evaluation_criteria %}
+                <ul class="list" id="list-evaluation">
+                    {% for item in results.evaluation_criteria %}
+                    <li data-search="{{ item | lower }}">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">No evaluation criteria found.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'compliance' in sa %}
+        <div class="tab-content" id="tab-compliance">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Departmental Compliance Checklist
+                </h3>
+                <div class="compliance-grid">
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Financial
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Financial', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Legal
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Legal', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Operations
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Operations', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Technical
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Technical', '') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'risks' in sa %}
+        <div class="tab-content" id="tab-risks">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Risk Assessment
+                </h3>
+                {% if results.risks %}
+                <div id="list-risks">
+                    {% for risk in results.risks %}
+                    <div class="risk-card severity-{{ risk.severity|string|lower }}" data-search="{{ risk.category|string|lower }} {{ risk.description|string|lower }}">
+                        <div style="flex:1">
+                            <div class="risk-top">
+                                <span class="risk-severity">{{ risk.severity }}</span>
+                                <span class="risk-category">{{ risk.category }}</span>
+                            </div>
+                            <div class="risk-desc">{{ risk.description }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No risks identified.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'timeline' in sa %}
+        <div class="tab-content" id="tab-timeline">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Timeline and Milestones
+                </h3>
+                {% if results.timeline %}
+                <div id="list-timeline">
+                    {% for t in results.timeline %}
+                    <div class="timeline-item" data-search="{{ t.milestone | lower }} {{ t.date_reference | lower }}">
+                        <div class="tl-dot"></div>
+                        <div>
+                            <div class="tl-milestone">{{ t.milestone }}</div>
+                            <div class="tl-date">{{ t.date_reference }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No timeline information found.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'key_requirements' in sa %}
+        <div class="tab-content" id="tab-requirements">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Key Requirements
+                </h3>
+                {% if results.key_requirements %}
+                <div id="list-requirements">
+                    {% for req in results.key_requirements %}
+                    <div class="key-req-item" data-search="{{ req | lower }}">
+                        <div class="kr-num">{{ loop.index }}</div>
+                        <div class="kr-text">{{ req }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No key requirements extracted.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'go_nogo' in sa %}
+        <div class="tab-content" id="tab-gonogo">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Go / No-Go Recommendation
+                </h3>
+                {% set gn = results.get('go_nogo', {}) %}
+                {% set score = gn.score if gn.score is defined else 0 %}
+                {% set verdict = gn.verdict if gn.verdict is defined else '' %}
+                {% set vlow = (verdict|string|lower) if verdict else '' %}
+                {% set gauge_color = '#10b981' if vlow == 'go' else ('#f59e0b' if vlow == 'caution' else '#ef4444') %}
+                {% set circumference = 2 * 3.14159 * 54 %}
+                {% set offset = circumference - (score / 100 * circumference) %}
+                <div class="go-score-wrap">
+                    <div class="go-gauge">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="track" cx="70" cy="70" r="54"/>
+                            <circle class="arc" cx="70" cy="70" r="54"
+                                stroke="{{ gauge_color }}"
+                                stroke-dasharray="{{ circumference }}"
+                                stroke-dashoffset="{{ offset }}"/>
+                        </svg>
+                        <div class="go-gauge-label">
+                            <span class="pct" style="color:{{ gauge_color }}">{{ score }}</span>
+                            <span class="pct-label">out of 100</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="go-verdict {{ vlow }}">{{ verdict }}</span>
+                        <div class="go-summary">{{ gn.summary if gn.summary is defined else '' }}</div>
+                    </div>
+                </div>
+                <div class="go-reasons">
+                    {% if gn.reasons is defined and gn.reasons %}
+                    {% for r in gn.reasons %}
+                    {% set wlow = (r.weight if r.weight is defined else '')|string|lower %}
+                    <div class="go-reason" data-search="{{ (r.factor if r.factor is defined else '') | lower }} {{ (r.detail if r.detail is defined else '') | lower }} {{ wlow }}">
+                        <div class="gr-icon">
+                            <svg class="icon" viewBox="0 0 24 24" style="color:{{ '#10b981' if wlow != 'high' else '#ef4444' }}">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="gr-body">
+                            <div class="gr-factor">
+                                {{ r.factor if r.factor is defined else '' }}
+                                <span class="gr-weight {{ wlow }}">{{ r.weight if r.weight is defined else '' }}</span>
+                            </div>
+                            <div class="gr-detail">{{ r.detail if r.detail is defined else '' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">No go/no-go analysis available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'strategic_checklist' in sa %}
+        <div class="tab-content" id="tab-strategic">
+        {% set sc = results.strategic_checklist if results.strategic_checklist is defined else None %}
+        {% if sc %}
+        {# count statuses across all 4 sections #}
+        {% set all_items = (sc.get('financial', []) if sc is defined else []) + (sc.get('legal', []) if sc is defined else []) + (sc.get('operations', []) if sc is defined else []) + (sc.get('technical', []) if sc is defined else []) %}
+        {% set counts = {'Go': 0, 'No-Go': 0, 'Review': 0, 'Escalate': 0, 'Caution': 0, 'Not Specified in RFP': 0} %}
+        {% for item in all_items %}
+        {% set st = item.status if item.status is defined else '' %}
+        {% if st == 'Go' %}{% set _ = counts.update({'Go': counts['Go'] + 1}) %}
+        {% elif st == 'No-Go' %}{% set _ = counts.update({'No-Go': counts['No-Go'] + 1}) %}
+        {% elif st == 'Review' %}{% set _ = counts.update({'Review': counts['Review'] + 1}) %}
+        {% elif st == 'Escalate' %}{% set _ = counts.update({'Escalate': counts['Escalate'] + 1}) %}
+        {% elif st == 'Caution' %}{% set _ = counts.update({'Caution': counts['Caution'] + 1}) %}
+        {% elif st == 'Not Specified in RFP' %}{% set _ = counts.update({'Not Specified in RFP': counts['Not Specified in RFP'] + 1}) %}
+        {% endif %}
+        {% endfor %}
+        <div class="section-card" style="border-left:4px solid var(--primary)">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Executive Summary
+            </h3>
+            <p class="sc-exec">{{ sc.executive_summary if sc.executive_summary is defined else 'No executive summary available.' }}</p>
+        </div>
+        <div class="section-card sc-summary">
+            <div class="sc-summary-grid">
+                <div class="sc-summary-item go"><span class="sc-summary-count">{{ counts['Go'] }}</span><span class="sc-summary-label">Go</span></div>
+                <div class="sc-summary-item no-go"><span class="sc-summary-count">{{ counts['No-Go'] }}</span><span class="sc-summary-label">No-Go</span></div>
+                <div class="sc-summary-item review"><span class="sc-summary-count">{{ counts['Review'] }}</span><span class="sc-summary-label">Review</span></div>
+                <div class="sc-summary-item escalate"><span class="sc-summary-count">{{ counts['Escalate'] }}</span><span class="sc-summary-label">Escalate</span></div>
+                <div class="sc-summary-item caution"><span class="sc-summary-count">{{ counts['Caution'] }}</span><span class="sc-summary-label">Caution</span></div>
+                <div class="sc-summary-item not-specified"><span class="sc-summary-count">{{ counts['Not Specified in RFP'] }}</span><span class="sc-summary-label">Not Specified</span></div>
+            </div>
+        </div>
+
+        {% set sections = {'financial': 'FINANCIAL / ACCOUNTING CHECKLIST', 'legal': 'LEGAL CHECKLIST', 'operations': 'OPERATIONS CHECKLIST', 'technical': 'TECHNICAL CHECKLIST'} %}
+        {% for key, label in sections.items() %}
+        {% set items = sc[key] if sc[key] is defined else [] %}
+        <div class="section-card sc-section">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24">
+                {% if key == 'financial' %}
+                <path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% elif key == 'legal' %}
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% elif key == 'operations' %}
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% else %}
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% endif %}
+                </svg>
+                {{ label }}
+            </h3>
+            {% if items %}
+            <div class="sc-items">
+                {% for item in items %}
+                {% set status = (item.status if item.status is defined else '')|string|lower %}
+                <div class="sc-item" data-search="{{ (item.item if item.item is defined else '') | lower }} {{ status }} {{ (item.reasoning if item.reasoning is defined else '') | lower }}">
+                    <div class="sc-item-header">
+                        <span class="sc-item-name">{{ item.item if item.item is defined else '' }}</span>
+                        {% if status %}
+                        <span class="sc-badge {{ status | replace(' ', '-') }}">{{ item.status }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="sc-item-reason">{{ item.reasoning if item.reasoning is defined else '' }}</div>
+
+                    {% set evid = item.rfp_evidence if item.rfp_evidence is defined else '' %}
+                    {% if evid %}
+                    <div class="sc-detail sc-evidence">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            RFP Evidence
+                        </div>
+                        <div class="sc-detail-text">{{ evid }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set rfp_says = item.what_rfp_says if item.what_rfp_says is defined else '' %}
+                    {% if rfp_says %}
+                    <div class="sc-detail sc-rfp-says">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            What RFP Says
+                        </div>
+                        <div class="sc-detail-text">{{ rfp_says }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set risk = item.risk_level if item.risk_level is defined else '' %}
+                    {% if risk %}
+                    <div class="sc-detail sc-risk">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Risk Level: <span class="risk-tag {{ risk | lower }}">{{ risk }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% set impact = item.impact_on_bid_strategy if item.impact_on_bid_strategy is defined else '' %}
+                    {% if impact %}
+                    <div class="sc-detail sc-impact">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Impact on Bid Strategy
+                        </div>
+                        <div class="sc-detail-text">{{ impact }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set mitigation = item.mitigation_strategy if item.mitigation_strategy is defined else '' %}
+                    {% if mitigation %}
+                    <div class="sc-detail sc-mitigation">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Mitigation Strategy
+                        </div>
+                        <div class="sc-detail-text">{{ mitigation }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set analysis = item.analysis if item.analysis is defined else '' %}
+                    {% if analysis %}
+                    <div class="sc-detail sc-analysis">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Deep Analysis
+                        </div>
+                        <div class="sc-detail-text">{{ analysis }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set rec = item.recommendation if item.recommendation is defined else '' %}
+                    {% if rec %}
+                    <div class="sc-detail sc-rec">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Recommendation
+                        </div>
+                        <div class="sc-detail-text">{{ rec }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">No items evaluated in this section.</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">Strategic checklist not available for this analysis.</div>
+        {% endif %}
+        </div>
+        {% endif %}
+
+    <div class="toast" id="toast">
+        <svg class="icon toast-icon" style="color:var(--green)" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="toast-msg"></span>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            if (theme === 'dark') {
+                var icon = document.getElementById('themeIcon');
+                if (icon) {
+                    icon.outerHTML = '<svg class="icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                }
+            }
+
+            var tabs = document.querySelectorAll('.tab-btn');
+            var contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(function(t) { t.classList.remove('active'); });
+                    contents.forEach(function(c) { c.classList.remove('active'); });
+                    tab.classList.add('active');
+                    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+            // Auto-select first tab if none active
+            var activeTab = document.querySelector('.tab-btn.active');
+            if (!activeTab && tabs.length > 0) {
+                tabs[0].classList.add('active');
+                var firstContent = document.getElementById('tab-' + tabs[0].dataset.tab);
+                if (firstContent) firstContent.classList.add('active');
+            }
+
+            // ===== HYBRID TAB BAR =====
+            (function() {
+                var container = document.getElementById('tabContainer');
+                var fade = document.getElementById('tabsFade');
+                var arrow = document.getElementById('tabScrollArrow');
+                if (!container || !fade || !arrow) return;
+                var isTouch = window.matchMedia('(pointer: coarse)').matches;
+                function updateFade() {
+                    var atEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2;
+                    fade.classList.toggle('show', !atEnd && !isTouch);
+                    arrow.classList.toggle('visible', !atEnd && !isTouch);
+                }
+                container.addEventListener('scroll', updateFade);
+                window.addEventListener('resize', updateFade);
+                setTimeout(updateFade, 200);
+                arrow.addEventListener('click', function() {
+                    var amount = container.clientWidth * 0.7;
+                    var target = Math.min(container.scrollLeft + amount, container.scrollWidth - container.clientWidth);
+                    container.scrollTo({ left: target, behavior: 'smooth' });
+                });
+                container.addEventListener('touchstart', function() { arrow.classList.remove('visible'); fade.classList.remove('show'); });
+            })();
+
+            window.toggleDeliverable = function(label) {
+                var parent = label.closest('.tree-parent');
+                if (!parent) return;
+                parent.classList.toggle('collapsed');
+            };
+
+            window.filterResults = function(query) {
+                var q = query.toLowerCase().trim();
+                var anyVisible = false;
+
+                // Handle flat list items (old format + other sections like evaluation, risks)
+                document.querySelectorAll('.tab-content.active .list [data-search]').forEach(function(el) {
+                    el.style.display = (!q || el.dataset.search.includes(q)) ? '' : 'none';
+                    if (el.style.display !== 'none') anyVisible = true;
+                });
+
+                // Handle tree view items (new hierarchical deliverables)
+                document.querySelectorAll('.tab-content.active .tree-parent').forEach(function(parent) {
+                    if (!q) {
+                        parent.style.display = '';
+                        parent.querySelectorAll('.tree-child').forEach(function(c) { c.style.display = ''; });
+                        anyVisible = true;
+                        return;
+                    }
+                    var parentMatch = parent.dataset.search && parent.dataset.search.includes(q);
+                    var hasVisibleChild = false;
+                    parent.querySelectorAll('.tree-child').forEach(function(child) {
+                        if (child.dataset.search && child.dataset.search.includes(q)) {
+                            child.style.display = '';
+                            hasVisibleChild = true;
+                        } else {
+                            child.style.display = parentMatch ? '' : 'none';
+                        }
+                    });
+                    if (parentMatch || hasVisibleChild) {
+                        parent.style.display = '';
+                        parent.classList.remove('collapsed');
+                        anyVisible = true;
+                    } else {
+                        parent.style.display = 'none';
+                    }
+                });
+
+                document.querySelectorAll('.tab-content.active .section-card').forEach(function(card) {
+                    var visible = card.querySelectorAll('.list [data-search]:not([style*="display: none"]), .tree-parent:not([style*="display: none"])');
+                    var empty = card.querySelector('.empty-state');
+                    if (empty) empty.style.display = visible.length === 0 ? '' : 'none';
+                });
+            };
+
+            var toast = document.getElementById('toast');
+            function showToast(msg) {
+                toast.querySelector('.toast-msg').textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 18000);
+            }
+            document.addEventListener('DOMContentLoaded', function() { showToast('Analysis complete!'); });
+
+
+        })();
+    </script>
+    <script>
+        (function() {
+            document.addEventListener('click', function(e) {
+                var a = e.target.closest('a');
+                if (!a) return;
+                var href = a.getAttribute('href');
+                if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+                if (!document.startViewTransition) return;
+                e.preventDefault();
+                document.startViewTransition(function() { location.href = href; });
+            });
+        })();
+    </script>
+</body>
+</html>

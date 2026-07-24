@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFP Automation Portal</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .bg-animation {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden; pointer-events: none; z-index: 0;
+        }
+        .bg-animation .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .bg-animation .orb:nth-child(1) {
+            width: 600px; height: 600px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -200px; left: -200px; animation-delay: 0s;
+        }
+        .bg-animation .orb:nth-child(2) {
+            width: 500px; height: 500px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            bottom: -150px; right: -150px; animation-delay: -7s;
+        }
+        .bg-animation .orb:nth-child(3) {
+            width: 400px; height: 400px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -14s;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: flex-end;
+            padding: 20px 80px 0 0; gap: 12px;
+        }
+        .nav a {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500;
+            padding: 8px 16px; border-radius: 8px; transition: all var(--transition);
+        }
+        .nav a:hover { background: var(--primary-light); color: var(--primary); }
+
+        .main-container {
+            position: relative; z-index: 1;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .hero { text-align: center; margin-bottom: 48px; animation: fadeUp 0.8s ease-out; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--primary-light); border: 1px solid var(--primary);
+            color: var(--primary); font-size: 13px; font-weight: 600;
+            padding: 6px 16px; border-radius: 100px; margin-bottom: 20px;
+            letter-spacing: 0.3px;
+        }
+        .hero .badge .icon { width: 16px; height: 16px; color: var(--primary); }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800;
+            line-height: 1.15; margin-bottom: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 17px; color: var(--text-secondary);
+            max-width: 520px; line-height: 1.6;
+        }
+
+        .upload-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 48px;
+            width: 100%; max-width: 560px; box-shadow: var(--shadow-lg);
+            animation: fadeUp 0.8s ease-out 0.1s both;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border); border-radius: var(--radius-sm);
+            padding: 48px 24px; text-align: center; cursor: pointer;
+            transition: all var(--transition); position: relative; overflow: hidden;
+        }
+        .drop-zone::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--primary-light); opacity: 0; transition: opacity var(--transition);
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary); transform: translateY(-2px);
+        }
+        .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
+        .drop-zone.dragover {
+            border-style: solid; box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .drop-zone-content { position: relative; z-index: 1; }
+        .drop-zone .icon-wrap {
+            width: 64px; height: 64px; border-radius: 16px;
+            background: var(--primary-light); display: flex;
+            align-items: center; justify-content: center;
+            margin: 0 auto 16px; transition: transform var(--transition);
+        }
+        .drop-zone:hover .icon-wrap { transform: scale(1.1) rotate(-5deg); }
+        .drop-zone .icon-wrap .icon { width: 28px; height: 28px; color: var(--primary); }
+
+        .drop-zone .main-label { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .drop-zone .main-label span { color: var(--primary); }
+        .drop-zone .sub-label { font-size: 13px; color: var(--text-muted); }
+
+        #rfp_file { display: none; }
+
+        .file-preview {
+            display: none; margin-top: 16px; padding: 12px 16px;
+            background: var(--primary-light); border-radius: var(--radius-sm);
+            border: 1px solid var(--primary); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .file-preview.show { display: flex; align-items: flex-start; gap: 12px; }
+        .file-preview .file-badges { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+        .file-preview .file-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 10px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 6px;
+            font-size: 12px; color: var(--text); max-width: 100%;
+        }
+        .file-preview .file-badge .badge-icon { width: 14px; height: 14px; flex-shrink: 0; color: var(--primary); }
+        .file-preview .file-badge .badge-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-preview .file-badge .badge-size { color: var(--text-muted); font-size: 11px; flex-shrink: 0; }
+        .file-preview .file-summary { font-size: 12px; color: var(--text-muted); padding: 5px 0; }
+        .file-preview .file-remove {
+            background: none; border: none; cursor: pointer;
+            padding: 4px 8px; border-radius: 6px; transition: all var(--transition); flex-shrink: 0;
+        }
+        .file-preview .file-remove .icon { width: 18px; height: 18px; color: var(--text-muted); }
+        .file-preview .file-remove:hover { background: rgba(239,68,68,0.1); }
+        .file-preview .file-remove:hover .icon { color: #ef4444; }
+
+        .analyze-btn {
+            display: none; width: 100%; margin-top: 20px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff; border: none; border-radius: var(--radius-sm);
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: all var(--transition); position: relative; overflow: hidden;
+            font-family: inherit;
+        }
+        .analyze-btn.show { display: block; animation: slideIn 0.3s ease-out; }
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--primary-glow);
+        }
+        .analyze-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .analyze-btn .btn-content { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .analyze-btn .spinner {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: none;
+        }
+        .analyze-btn.loading .spinner { display: block; }
+        .analyze-btn.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px; margin-top: 48px;
+            width: 100%; max-width: 560px;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+        .feature-item {
+            background: var(--surface); border: 2px solid var(--border);
+            border-radius: var(--radius-sm); padding: 18px 14px;
+            text-align: center; transition: all var(--transition); cursor: pointer;
+            position: relative; user-select: none;
+        }
+        .feature-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .feature-item.selected {
+            border-color: var(--green); background: rgba(16,185,129,0.06);
+        }
+        .feature-item.deselected {
+            opacity: 0.5; border-style: dashed;
+        }
+        .feature-item.deselected:hover { opacity: 0.8; }
+        .feature-item .fi-check {
+            position: absolute; top: 6px; right: 6px; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .feature-item.selected .fi-check {
+            background: var(--green); color: #fff;
+        }
+        .feature-item.deselected .fi-check {
+            background: var(--border); color: var(--text-muted);
+        }
+        .feature-item.locked .fi-check {
+            background: #f59e0b; color: #fff;
+        }
+        .feature-item .fi-icon { margin-bottom: 6px; }
+        .feature-item .fi-icon .icon { width: 24px; height: 24px; color: var(--primary); }
+        .feature-item.selected .fi-icon .icon { color: var(--green); }
+        .feature-item .fi-title { font-size: 13px; font-weight: 600; color: var(--text); }
+        .feature-item.selected .fi-title { color: var(--green); }
+        .feature-item .fi-desc {
+            font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.3;
+            display: none;
+        }
+        .feature-item:hover .fi-desc { display: block; }
+        .feature-item .fi-hover-tip {
+            position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: var(--text); color: var(--surface); font-size: 11px;
+            padding: 4px 10px; border-radius: 6px; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        .feature-item:hover .fi-hover-tip { opacity: 1; }
+        .section-counter {
+            text-align: center; font-size: 12px; color: var(--text-muted);
+            margin-top: 12px; width: 100%; max-width: 560px;
+        }
+
+        .footer {
+            position: relative; z-index: 1;
+            text-align: center; padding: 24px;
+            color: var(--text-muted); font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .nav { padding: 16px 20px 0 0; }
+            .upload-card { padding: 24px; }
+            .drop-zone { padding: 32px 16px; }
+            .features { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        }
+
+        /* ===== ANALYZING OVERLAY ===== */
+        .analyzing-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            animation: overlayFadeIn 0.3s ease-out;
+        }
+        .analyzing-overlay.show { display: flex; }
+        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .analyzing-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 48px; max-width: 480px;
+            width: 90%; text-align: center;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            animation: cardPop 0.4s ease-out;
+        }
+        @keyframes cardPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .analyzing-ring-wrap {
+            position: relative; width: 88px; height: 88px;
+            margin: 0 auto 24px;
+        }
+        .analyzing-ring {
+            position: absolute; inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #667eea, #764ba2, #667eea);
+            animation: spinRing 1.2s linear infinite;
+            mask: radial-gradient(farthest-side, transparent 60%, #000 61%);
+            -webkit-mask: radial-gradient(farthest-side, transparent 60%, #000 61%);
+        }
+        .analyzing-ring-inner {
+            position: absolute; inset: 4px; border-radius: 50%;
+            background: var(--surface);
+            display: flex; align-items: center; justify-content: center;
+        }
+        @keyframes spinRing { to { transform: rotate(360deg); } }
+
+        .analyzing-card h2 {
+            font-size: 20px; font-weight: 700; color: var(--text);
+            margin-bottom: 4px;
+        }
+        .analyzing-card .analyzing-sub {
+            font-size: 13px; color: var(--text-muted); margin-bottom: 32px;
+        }
+        .analyzing-dots {
+            display: inline-flex; gap: 3px; margin-left: 4px;
+        }
+        .analyzing-dots span {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--primary);
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+        .analyzing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .analyzing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotBounce {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        .analyzing-steps {
+            text-align: left; margin-bottom: 24px;
+        }
+        .step-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 10px 14px; border-radius: 10px;
+            margin-bottom: 6px; transition: all 0.3s ease;
+            opacity: 0.35;
+        }
+        .step-item .step-icon { flex-shrink: 0; }
+        .step-item .step-icon .icon { width: 20px; height: 20px; }
+        .step-item .step-label { font-size: 14px; font-weight: 500; color: var(--text); }
+        .step-item.active {
+            opacity: 1; background: var(--primary-light);
+        }
+        .step-item.active .step-icon .icon { color: var(--primary); }
+        .step-item.done {
+            opacity: 0.7;
+        }
+        .step-item.done .step-icon .icon { color: var(--green); }
+        .step-item.pending { opacity: 0.35; }
+
+        .analyzing-hint {
+            font-size: 12px; color: var(--text-muted);
+        }
+
+        /* ===== PROVIDER TOGGLE ===== */
+        .provider-wrap {
+            margin-top: 16px; display: none;
+        }
+        .provider-toggle {
+            display: flex; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); overflow: hidden;
+        }
+        .provider-toggle label {
+            flex: 1; text-align: center; padding: 8px 12px; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: var(--text-secondary);
+            transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .provider-toggle label .icon { width: 16px; height: 16px; }
+        .provider-toggle input { display: none; }
+        .provider-toggle input:checked + label {
+            background: var(--primary); color: #fff; box-shadow: 0 2px 6px var(--primary-glow);
+        }
+    </style>
+</head>
+<body>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-package" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <div class="bg-animation">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon icon-moon" id="themeIconMoon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+    </nav>
+
+    <div class="main-container page-enter">
+        <div class="hero">
+            <div class="badge">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                AI-Powered Analysis
+            </div>
+            <h1 style="display:flex;align-items:center;justify-content:center;gap:12px">
+                <svg width="40" height="40" viewBox="0 0 64 64" style="flex-shrink:0">
+                    <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs>
+                    <rect width="64" height="64" rx="14" fill="url(#lg)"/>
+                    <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                RFP Intelligence Portal
+            </h1>
+            <p>Upload your RFP document and let AI extract deliverables, evaluation criteria, risks, timelines, and compliance requirements instantly.</p>
+        </div>
+
+        <div class="upload-card">
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-content">
+                        <div class="icon-wrap">
+                            <svg class="icon icon-xl" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="main-label"><span>Choose files</span> or drag &amp; drop</div>
+                        <div class="sub-label">PDF, DOCX, or TXT (multiple files supported)</div>
+                    </div>
+                    <input type="file" name="rfp_file" id="rfp_file" accept=".pdf,.docx,.txt" multiple>
+                </div>
+
+                <div class="file-preview" id="filePreview">
+                    <div class="file-badges" id="fileBadges"></div>
+                    <div class="file-summary" id="fileSummary"></div>
+                    <button type="button" class="file-remove" id="fileRemove">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="title-field" style="margin-top:16px;display:none" id="titleField">
+                    <label style="display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;vertical-align:middle"><line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4" y1="15" x2="20" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="3" x2="8" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="3" x2="14" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Analysis Name
+                    </label>
+                    <input type="text" name="analysis_title" id="analysisTitle" placeholder="e.g. Cloud Migration RFP" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:all var(--transition);box-sizing:border-box">
+                </div>
+
+                <div class="provider-wrap" id="providerWrap">
+                    <div class="provider-toggle">
+                        <input type="radio" name="provider" id="provGemini" value="gemini">
+                        <label for="provGemini">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Gemini
+                        </label>
+                        <input type="radio" name="provider" id="provGroq" value="groq" checked>
+                        <label for="provGroq">
+                            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Groq (Fast)
+                        </label>
+                    </div>
+                </div>
+
+                <input type="hidden" name="sections" id="sectionsInput" value="summary,deliverables,evaluation_criteria,compliance,risks,timeline,key_requirements,go_nogo,strategic_checklist">
+
+                <button type="submit" class="analyze-btn" id="analyzeBtn" disabled>
+                    <span class="btn-content">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Analyze Document</span>
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <div class="features" id="sectionCards">
+            <div class="feature-item selected locked" data-section="summary">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="15" x2="15" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Summary</div>
+                <div class="fi-desc">Executive summary of the RFP</div>
+                <div class="fi-hover-tip">Always included</div>
+            </div>
+            <div class="feature-item selected" data-section="deliverables">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Deliverables</div>
+                <div class="fi-desc">Extract required items with references</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="evaluation_criteria">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Evaluation</div>
+                <div class="fi-desc">Scoring criteria parsed</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="compliance">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Compliance</div>
+                <div class="fi-desc">Legal, finance, tech check</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="risks">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Risks</div>
+                <div class="fi-desc">Identify key risks</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="timeline">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Timeline</div>
+                <div class="fi-desc">Dates, milestones &amp; deadlines</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="key_requirements">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Key Req.</div>
+                <div class="fi-desc">Critical requirements</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="go_nogo">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Go / No-Go</div>
+                <div class="fi-desc">Score &amp; recommendation</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="feature-item selected" data-section="strategic_checklist">
+                <div class="fi-check">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-icon">
+                    <svg class="icon icon-lg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="fi-title">Checklist</div>
+                <div class="fi-desc">23-item bid qualification</div>
+                <div class="fi-hover-tip">Click to toggle</div>
+            </div>
+            <div class="section-counter" id="sectionCounter">All 9 sections selected</div>
+        </div>
+    </div>
+
+    <div class="analyzing-overlay" id="analyzingOverlay">
+        <div class="analyzing-card">
+            <div class="analyzing-ring-wrap">
+                <div class="analyzing-ring"></div>
+                <div class="analyzing-ring-inner">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                </div>
+            </div>
+            <h2>Analyzing Document<span class="analyzing-dots" id="analyzingCount"><span></span><span></span><span></span></span></h2>
+            <div class="analyzing-sub">Please wait while we process your RFP</div>
+            <div class="analyzing-steps">
+                <div class="step-item" data-step="0">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Extracting text from document</div>
+                </div>
+                <div class="step-item" data-step="1">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="9" width="6" height="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="1" x2="9" y2="4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="1" x2="15" y2="4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="20" x2="9" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="20" x2="15" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="9" x2="23" y2="9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="20" y1="14" x2="23" y2="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="9" x2="4" y2="9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="14" x2="4" y2="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label" id="stepAiLabel">Running AI analysis (Gemini 2.5 Flash)</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Evaluating compliance &amp; risks</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Finalizing report</div>
+                </div>
+            </div>
+            <div class="analyzing-hint">Large documents may take 1&ndash;3 minutes for thorough analysis</div>
+        </div>
+    </div>
+
+    <div class="footer">RFP Automation Portal &mdash; Powered by Bilal Tech</div>
+
+    <div class="toast" id="toast">
+        <svg class="icon toast-icon" style="color:var(--green)" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="toast-msg"></span>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            var moonIcon = document.getElementById('themeIconMoon');
+            if (moonIcon && theme === 'dark') {
+                moonIcon.outerHTML = '<svg class="icon" id="themeIconMoon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            }
+
+            var dropZone = document.getElementById('dropZone');
+            var fileInput = document.getElementById('rfp_file');
+            var filePreview = document.getElementById('filePreview');
+
+            var fileRemove = document.getElementById('fileRemove');
+            var analyzeBtn = document.getElementById('analyzeBtn');
+            var form = document.getElementById('uploadForm');
+            var toast = document.getElementById('toast');
+            var overlay = document.getElementById('analyzingOverlay');
+            var stepItems = overlay.querySelectorAll('.step-item');
+            var droppedFiles = null;
+
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+
+            function showToast(msg, isError) {
+                toast.className = 'toast' + (isError ? ' error' : '');
+                var iconSvg = toast.querySelector('.toast-icon');
+                iconSvg.outerHTML = isError
+                    ? '<svg class="icon toast-icon" viewBox="0 0 24 24" style="color:var(--red)"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/></svg>'
+                    : '<svg class="icon toast-icon" viewBox="0 0 24 24" style="color:var(--green)"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                toast.querySelector('.toast-msg').textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 18000);
+            }
+
+            function handleFiles(files) {
+                var titleField = document.getElementById('titleField');
+                var providerWrap = document.getElementById('providerWrap');
+                var badges = document.getElementById('fileBadges');
+                var summary = document.getElementById('fileSummary');
+                if (!files || files.length === 0) {
+                    filePreview.classList.remove('show');
+                    analyzeBtn.classList.remove('show');
+                    titleField.style.display = 'none';
+                    if (providerWrap) providerWrap.style.display = 'none';
+                    analyzeBtn.disabled = true;
+                    return;
+                }
+                badges.innerHTML = '';
+                var totalSize = 0;
+                for (var i = 0; i < files.length; i++) {
+                    var f = files[i];
+                    totalSize += f.size;
+                    var ext = f.name.split('.').pop().toLowerCase();
+                    var badge = document.createElement('div');
+                    badge.className = 'file-badge';
+                    badge.innerHTML = '<svg class="badge-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge-name">' + f.name + '</span><span class="badge-size">(' + formatSize(f.size) + ')</span>';
+                    badges.appendChild(badge);
+                }
+                summary.textContent = files.length + ' file' + (files.length > 1 ? 's' : '') + ' (' + formatSize(totalSize) + ')';
+                filePreview.classList.add('show');
+                titleField.style.display = 'block';
+                if (providerWrap) providerWrap.style.display = 'block';
+                analyzeBtn.classList.add('show');
+                analyzeBtn.disabled = false;
+                var titleInput = document.getElementById('analysisTitle');
+                if (!titleInput.value) {
+                    titleInput.value = files[0].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+                }
+            }
+
+            function resetSteps() {
+                stepItems.forEach(function(el) {
+                    el.className = 'step-item pending';
+                });
+            }
+
+            function advanceStep(stepIndex) {
+                stepItems.forEach(function(el, i) {
+                    if (i < stepIndex) el.className = 'step-item done';
+                    else if (i === stepIndex) el.className = 'step-item active';
+                    else el.className = 'step-item pending';
+                });
+            }
+
+            dropZone.addEventListener('click', function() { fileInput.click(); });
+            fileInput.addEventListener('change', function(e) {
+                droppedFiles = null;
+                handleFiles(e.target.files);
+            });
+
+            dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                var files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    var valid = ['pdf', 'docx', 'txt'];
+                    for (var i = 0; i < files.length; i++) {
+                        var ext = files[i].name.split('.').pop().toLowerCase();
+                        if (!valid.includes(ext)) { showToast(files[i].name + ' is not supported. Use PDF, DOCX, or TXT.', true); return; }
+                        if (files[i].size > 50 * 1024 * 1024) { showToast(files[i].name + ' is too large (max 50MB).', true); return; }
+                    }
+                    droppedFiles = files;
+                    handleFiles(files);
+                }
+            });
+
+            document.querySelectorAll('input[name="provider"]').forEach(function(el) {
+                el.addEventListener('change', function() {
+                    var label = document.getElementById('stepAiLabel');
+                    label.textContent = this.value === 'groq' ? 'Running AI analysis (Groq Llama 3.3 70B)' : 'Running AI analysis (Gemini 2.5 Flash)';
+                });
+            });
+
+            // Section toggle cards
+            var sectionCards = document.querySelectorAll('#sectionCards .feature-item:not(.locked)');
+            var sectionsInput = document.getElementById('sectionsInput');
+            var sectionCounter = document.getElementById('sectionCounter');
+            function updateSections() {
+                var selected = [];
+                document.querySelectorAll('#sectionCards .feature-item').forEach(function(c) {
+                    if (c.classList.contains('selected')) selected.push(c.getAttribute('data-section'));
+                });
+                sectionsInput.value = selected.join(',');
+                var total = document.querySelectorAll('#sectionCards .feature-item').length;
+                var count = selected.length;
+                sectionCounter.textContent = count === total ? 'All ' + total + ' sections selected'
+                    : count + ' of ' + total + ' sections selected';
+            }
+            sectionCards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    this.classList.toggle('deselected');
+                    updateSections();
+                });
+            });
+
+            fileRemove.addEventListener('click', function() {
+                fileInput.value = '';
+                droppedFiles = null;
+                handleFiles(null);
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var activeFiles = droppedFiles || fileInput.files;
+                if (!activeFiles || activeFiles.length === 0) { showToast('Please select at least one file.', true); return; }
+                var selectedSects = sectionsInput.value.split(',').filter(Boolean);
+                if (selectedSects.length === 0) { showToast('Please select at least one analysis section.', true); return; }
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.disabled = true;
+
+                resetSteps();
+                advanceStep(0);
+                overlay.classList.add('show');
+
+                var fd = new FormData();
+                fd.append('analysis_title', document.getElementById('analysisTitle').value);
+                fd.append('provider', document.querySelector('input[name="provider"]:checked').value);
+                for (var i = 0; i < activeFiles.length; i++) {
+                    fd.append('rfp_file', activeFiles[i]);
+                }
+                var stepInterval = setInterval(function() {
+                    var active = overlay.querySelector('.step-item.active');
+                    if (active) {
+                        var next = active.nextElementSibling;
+                        if (next) {
+                            var idx = parseInt(next.getAttribute('data-step'), 10);
+                            advanceStep(idx);
+                        }
+                    }
+                }, 3000);
+
+                fetch('/upload', { method: 'POST', body: fd })
+                    .then(function(r) {
+                        if (!r.ok) return r.text().then(function(txt) { throw new Error(txt || r.statusText); });
+                        return r.text();
+                    })
+            .then(function(html) {
+                clearInterval(stepInterval);
+                advanceStep(4);
+                setTimeout(function() {
+                    if (document.startViewTransition) {
+                        document.startViewTransition(function() {
+                            document.open(); document.write(html); document.close();
+                        });
+                    } else {
+                        document.open(); document.write(html); document.close();
+                    }
+                }, 600);
+                    })
+                    .catch(function(err) {
+                        clearInterval(stepInterval);
+                        overlay.classList.remove('show');
+                        analyzeBtn.classList.remove('loading');
+                        analyzeBtn.disabled = false;
+                        showToast(err.message || 'Analysis failed. Please try again.', true);
+                    });
+            });
+        })();
+    </script>
+    <script>
+        // Smooth page transitions for internal links
+        (function() {
+            document.addEventListener('click', function(e) {
+                var a = e.target.closest('a');
+                if (!a) return;
+                var href = a.getAttribute('href');
+                if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+                if (!document.startViewTransition) return;
+                e.preventDefault();
+                document.startViewTransition(function() {
+                    location.href = href;
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
