@@ -5,7 +5,7 @@
 **Version:** 2.0  
 **Date:** July 2026  
 **Prepared for:** Internal Development  
-**Prepared by:** Bilal Tech
+**Prepared by:** Bilal (Team Lead), Isra Asif & Maria Khan
 
 ---
 
@@ -318,7 +318,7 @@ The system provides the following views:
 - Theme toggle: switches CSS variables via `data-theme` attribute on `<html>`.
 - Page transitions: View Transition API for fade-in on page load and crossfade on link clicks.
 - Toast notifications for errors (file too large, invalid type, API errors).
-- Footer: "Powered by Bilal Tech".
+- Footer: "Powered by Bilal (Team Lead), Isra Asif & Maria Khan".
 
 ### 4.2 Hardware Interfaces
 
@@ -359,7 +359,7 @@ All communications occur over HTTPS for external API calls. The web server liste
 
 ### 5.2 AI-Powered Analysis
 
-**FR-007**: The system SHALL support two AI providers: Gemini (via google-genai SDK) and Groq (via groq SDK).  
+**FR-007**: The system SHALL support two AI providers: Gemini (via google-genai SDK) and OpenRouter (via HTTP API).  
 **Priority**: High  
 **FR-008**: The user SHALL select the AI provider before upload via a toggle on the upload page. The default provider SHALL be Gemini.  
 **Priority**: High  
@@ -475,7 +475,7 @@ CREATE TABLE IF NOT EXISTS analyses (
     id TEXT PRIMARY KEY,                    -- UUID (first 8 characters)
     title TEXT NOT NULL,                    -- User-defined or auto-generated title
     filename TEXT NOT NULL,                 -- Original uploaded filename
-    provider TEXT NOT NULL DEFAULT 'gemini', -- 'gemini' or 'groq'
+    provider TEXT NOT NULL DEFAULT 'gemini', -- 'gemini' or 'openrouter'
     timestamp TEXT NOT NULL,                -- ISO 8601 timestamp
     hash TEXT NOT NULL,                     -- First 16 chars of SHA-256
     word_count INTEGER DEFAULT 0,           -- Word count of extracted text
@@ -734,6 +734,6 @@ AI responses are parsed and normalized through a two-stage pipeline: `parse_resi
 
 ---
 
-*Document prepared by Bilal Tech. Updated July 2026 to reflect v2.0 changes: 37-item structured checklist, updated AI models, parse_resilient_json, and updated configuration constants.*
+*Document prepared by Bilal (Team Lead), Isra Asif & Maria Khan. Updated July 2026 to reflect v2.0 changes: 37-item structured checklist, updated AI models, parse_resilient_json, and updated configuration constants.*
 
 *End of Software Requirements Specification*

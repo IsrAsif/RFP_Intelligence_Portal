@@ -1,0 +1,49 @@
+{
+  "34a52412": {
+    "go_nogo.score": 88,
+    "timeline": [],
+    "strategic_checklist.no_go_count": 0
+  },
+  "0d1c6bbc": {
+    "go_nogo.score": 90,
+    "timeline": [
+      {
+        "milestone": "Issue Date: June 16, 2026",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Pre-Bid Conference: Virtually on Tuesday, July 7, 2026, at 1:00 PM EST",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Closing Date and Time: July 16, 2026, at 11:00 AM EST",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Line Item 16 Term: August 1, 2026 \u2013 August 31, 2026 (No charge month)",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Contract Start Date: September 1, 2026",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Contract End Date: August 31, 2027",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Invoices must be submitted within 30 days of receipt of equipment, software, or services.",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Recommended awardee must submit required documents (Attachment A and C) within five (5) Business Days of notification.",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Bids are irrevocable for 120 days following the closing date of bids.",
+        "date_reference": ""
+      }
+    ],
+    "strategic_checklist.no_go_count": 0
+  }
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requirements — {{ analysis_title }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        body { background: var(--bg); margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        .nav{position:relative;z-index:10;display:flex;justify-content:flex-end;align-items:center;padding:20px 80px 0 0;gap:12px}
+        .nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;padding:6px 14px;border-radius:var(--radius-sm);transition:all var(--transition)}
+        .nav a:hover{background:var(--primary-light);color:var(--primary)}
+        .main{max-width:1100px;margin:0 auto;padding:24px}
+        .header{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow)}
+        .header h1{font-size:20px;font-weight:700;color:var(--text);margin:0 0 4px}
+        .header .sub{font-size:13px;color:var(--text-secondary)}
+        .header .sub span{margin-right:16px}
+        .stats{display:flex;gap:16px;margin-top:12px}
+        .stat{background:var(--bg);border-radius:var(--radius-sm);padding:8px 16px;font-size:13px}
+        .stat strong{font-size:18px;display:block;color:var(--text)}
+        .stat-label{color:var(--text-muted)}
+        .req-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+        .req-table th{background:var(--bg);padding:10px 12px;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);text-align:left}
+        .req-table td{padding:10px 12px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:top}
+        .req-table tr:last-child td{border-bottom:none}
+        .req-table tr:hover td{background:var(--surface-hover)}
+        .req-id{font-family:monospace;font-size:12px;color:var(--text-muted);white-space:nowrap}
+        .category{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
+        .cat-Financial{background:#e8f5e9;color:#2e7d32}
+        .cat-Legal{background:#e3f2fd;color:#1565c0}
+        .cat-Technical{background:#fff3e0;color:#e65100}
+        .cat-Operations{background:#f3e5f5;color:#7b1fa2}
+        .cat-General{background:#f5f5f5;color:#616161}
+        .status{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
+        .status-Yes{background:#e8f5e9;color:#2e7d32}
+        .status-No{background:#ffebee;color:#c62828}
+        .status-Partial{background:#fff8e1;color:#f57f17}
+        .section-ref{font-family:monospace;font-size:12px;color:var(--text-secondary)}
+        .empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+        .empty svg{width:48px;height:48px;margin-bottom:12px;opacity:.3}
+        .verify-status{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer}
+        .verify-status.go{background:#e8f5e9;color:#2e7d32}
+        .verify-status.no-go{background:#ffebee;color:#c62828}
+        .verify-status.review{background:#fff8e1;color:#f57f17}
+        .verify-detail{display:none;margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px}
+        .verify-detail.open{display:block}
+        .verify-detail dt{font-weight:600;color:var(--text-secondary);margin-top:6px}
+        .verify-detail dt:first-child{margin-top:0}
+        .verify-detail dd{margin:2px 0 0 0;color:var(--text)}
+        .export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:opacity var(--transition)}
+        .export-btn:hover{opacity:.85}
+        .export-btn svg{width:16px;height:16px}
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/company_profile">Company Profile</a>
+        <a href="/view/{{ record_id }}">Back to Results</a>
+    </nav>
+    <div class="main">
+        <div class="header">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                    <h1>Extracted Requirements</h1>
+                    <div class="sub">
+                        <span>{{ analysis_title }}</span>
+                        <span>{{ filename }}</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button class="export-btn" id="verifyReqBtn" onclick="verifyRequirements()" style="background:var(--primary)">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span id="verifyBtnLabel">Verify</span>
+                    </button>
+                    <a class="export-btn" href="/api/analysis/{{ record_id }}/export.xlsx">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="16" x2="16" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="20" x2="12" y2="20"/></svg>
+                        Export Excel
+                    </a>
+                </div>
+            </div>
+            <div class="stats">
+                {% set cat_counts = requirements | groupby('category') %}
+                <div class="stat"><strong>{{ requirements | length }}</strong><span class="stat-label">Total</span></div>
+                <div class="stat"><strong>{{ requirements | selectattr('initial_status', 'equalto', 'Yes') | list | length }}</strong><span class="stat-label">Compliant</span></div>
+                <div class="stat"><strong>{{ requirements | selectattr('initial_status', 'equalto', 'No') | list | length }}</strong><span class="stat-label">Non-Compliant</span></div>
+                <div class="stat"><strong>{{ requirements | selectattr('initial_status', 'equalto', 'Partial') | list | length }}</strong><span class="stat-label">Partial</span></div>
+            </div>
+        </div>
+
+        {% if requirements %}
+        <table class="req-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Section</th>
+                    <th>Status</th>
+                    <th>Verified</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requirements %}
+                {% set vid = req.get('req_id', '') %}
+                {% set v = verification.get(vid, {}) %}
+                <tr>
+                    <td class="req-id">{{ req.get('req_id', '') }}</td>
+                    <td><span class="category cat-{{ req.get('category', 'General') }}">{{ req.get('category', 'General') }}</span></td>
+                    <td style="max-width:400px">{{ req.get('description', '') }}</td>
+                    <td class="section-ref">{{ req.get('section_ref', '—') }}</td>
+                    <td><span class="status status-{{ req.get('initial_status', '') }}">{{ req.get('initial_status', '—') }}</span></td>
+                    <td>
+                        {% if v and v.get('status') %}
+                        <span class="verify-status {{ v.get('status', '')|lower|replace(' ', '-') }}" onclick="toggleDetail('{{ vid }}')">{{ v.get('status', '') }}</span>
+                        <div class="verify-detail" id="detail-{{ vid }}">
+                            <dt>Reasoning</dt><dd>{{ v.get('reasoning', '') }}</dd>
+                            <dt>RFP Evidence</dt><dd>{{ v.get('rfp_evidence', '') }}</dd>
+                            <dt>Company Evidence</dt><dd>{{ v.get('company_evidence', '') or '—' }}</dd>
+                            <dt>Risk Level</dt><dd>{{ v.get('risk_level', '') or '—' }}</dd>
+                            <dt>Mitigation</dt><dd>{{ v.get('mitigation_strategy', '') or '—' }}</dd>
+                        </div>
+                        {% else %}
+                        <span style="color:var(--text-muted);font-size:12px">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <p>No requirements extracted yet.</p>
+            <p style="font-size:13px"><a href="/view/{{ record_id }}" style="color:var(--primary)">Go to results</a> and click "Extract Requirements".</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleDetail(id) {
+            var el = document.getElementById('detail-' + id);
+            if (el) el.classList.toggle('open');
+        }
+
+        window.verifyRequirements = function() {
+            var btn = document.getElementById('verifyReqBtn');
+            var label = document.getElementById('verifyBtnLabel');
+            if (!btn || !label) return;
+            btn.disabled = true;
+            label.textContent = 'Verifying...';
+            fetch('/verify_requirements/{{ record_id }}', { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.error) {
+                        label.textContent = 'Error: ' + data.error;
+                        btn.disabled = false;
+                        return;
+                    }
+                    label.textContent = 'Done (' + data.requirement_count + ' verified)';
+                    btn.disabled = false;
+                    // Reload page to show updated verification status
+                    location.reload();
+                })
+                .catch(function(err) {
+                    label.textContent = 'Failed';
+                    btn.disabled = false;
+                });
+        };
+    </script>
+</body>
+</html>

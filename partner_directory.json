@@ -1,0 +1,48 @@
+{
+  "partners": [
+    {
+      "partner_name": "CloudTech Solutions",
+      "capabilities": [
+        "Cloud infrastructure migration and management",
+        "AWS, Azure, and GCP managed services",
+        "DevOps pipeline setup and CI/CD automation",
+        "Kubernetes orchestration and containerization",
+        "24/7 cloud operations monitoring"
+      ],
+      "contact_hint": "Maria Sanchez, Partner Relations Director"
+    },
+    {
+      "partner_name": "SecureNet Defense",
+      "capabilities": [
+        "Cybersecurity assessment and penetration testing",
+        "SOC 2 and ISO 27001 compliance consulting",
+        "Network security architecture and firewall management",
+        "Incident response and forensic analysis",
+        "Security awareness training programs"
+      ],
+      "contact_hint": "James Chen, Cybersecurity Practice Lead"
+    },
+    {
+      "partner_name": "DataBridge Analytics",
+      "capabilities": [
+        "Data engineering and ETL pipeline development",
+        "Business intelligence dashboard implementation",
+        "Machine learning model deployment and MLOps",
+        "Data lake and warehouse architecture",
+        "Real-time data streaming solutions"
+      ],
+      "contact_hint": "Dr. Priya Patel, Data Solutions Director"
+    },
+    {
+      "partner_name": "FieldOps Pro",
+      "capabilities": [
+        "Field service management software implementation",
+        "Mobile workforce enablement and scheduling",
+        "IoT sensor integration for remote monitoring",
+        "Geographic information system (GIS) integration",
+        "Asset tracking and inventory management systems"
+      ],
+      "contact_hint": "Tom Williams, Operations Technology Director"
+    }
+  ]
+}

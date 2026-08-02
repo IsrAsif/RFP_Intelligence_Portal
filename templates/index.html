@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFP Automation Portal</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 20px 80px 0 0; gap: 12px;
+        }
+        .nav a {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 14px; font-weight: 500;
+            padding: 6px 14px; border-radius: var(--radius-sm); transition: all var(--transition);
+        }
+        .nav a:hover { background: var(--primary-light); color: var(--primary); }
+        .nav a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        .main-container {
+            position: relative; z-index: 1;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero h1 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700;
+            line-height: 1.2; margin-bottom: 10px; color: var(--text);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .hero h1 svg { flex-shrink: 0; }
+        .hero p {
+            font-size: 15px; color: var(--text-secondary);
+            max-width: 480px; line-height: 1.6;
+        }
+
+        .upload-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 40px;
+            width: 100%; max-width: 520px; box-shadow: var(--shadow-md);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border); border-radius: var(--radius);
+            padding: 44px 24px; text-align: center; cursor: pointer;
+            transition: all var(--transition); position: relative; overflow: hidden;
+        }
+        .drop-zone::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--primary-light); opacity: 0; transition: opacity var(--transition);
+        }
+        .drop-zone:hover, .drop-zone.dragover, .drop-zone:focus-visible {
+            border-color: var(--primary);
+        }
+        .drop-zone:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
+        .drop-zone.dragover {
+            border-style: solid; box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .drop-zone-content { position: relative; z-index: 1; }
+        .drop-zone .icon-wrap {
+            width: 56px; height: 56px; border-radius: var(--radius);
+            background: var(--primary-light); display: flex;
+            align-items: center; justify-content: center;
+            margin: 0 auto 14px; transition: all var(--transition);
+        }
+        .drop-zone:hover .icon-wrap { background: var(--primary); }
+        .drop-zone .icon-wrap .icon { width: 24px; height: 24px; color: var(--primary); transition: color var(--transition); }
+        .drop-zone:hover .icon-wrap .icon { color: var(--surface); }
+
+        .drop-zone .main-label { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .drop-zone .main-label span { color: var(--primary); }
+        .drop-zone .sub-label { font-size: 13px; color: var(--text-muted); }
+
+        #rfp_file { display: none; }
+
+        .file-preview {
+            display: none; margin-top: 14px; padding: 12px 16px;
+            background: var(--primary-light); border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .file-preview.show { display: flex; align-items: flex-start; gap: 12px; }
+        .file-preview .file-badges { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+        .file-preview .file-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 12px; color: var(--text); max-width: 100%;
+        }
+        .file-preview .file-badge .badge-icon { width: 14px; height: 14px; flex-shrink: 0; color: var(--primary); }
+        .file-preview .file-badge .badge-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-preview .file-badge .badge-size { color: var(--text-muted); font-size: 11px; flex-shrink: 0; }
+        .file-preview .file-summary { font-size: 12px; color: var(--text-muted); padding: 4px 0; }
+        .file-preview .file-remove {
+            background: none; border: none; cursor: pointer;
+            padding: 4px 8px; border-radius: var(--radius-sm); transition: all var(--transition); flex-shrink: 0;
+        }
+        .file-preview .file-remove .icon { width: 16px; height: 16px; color: var(--text-muted); }
+        .file-preview .file-remove:hover { background: var(--red-light); }
+        .file-preview .file-remove:hover .icon { color: var(--red); }
+
+        .analyze-btn {
+            display: none; width: 100%; margin-top: 16px;
+            padding: 14px 24px;
+            background: var(--gradient); color: var(--surface); border: none;
+            border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all var(--transition); position: relative; overflow: hidden;
+            font-family: inherit;
+        }
+        .analyze-btn.show { display: block; }
+        .analyze-btn:hover:not(:disabled) { opacity: 0.92; }
+        .analyze-btn:active:not(:disabled) { opacity: 0.85; }
+        .analyze-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .analyze-btn .btn-content { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .analyze-btn .spinner {
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--surface); border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: none;
+        }
+        .analyze-btn.loading .spinner { display: block; }
+        .analyze-btn.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px; margin-top: 32px;
+            width: 100%; max-width: 520px;
+        }
+        .feature-item {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 14px 10px;
+            text-align: center; transition: all var(--transition); cursor: pointer;
+            position: relative; user-select: none;
+        }
+        .feature-item:hover { border-color: var(--border-strong); }
+        .feature-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .feature-item.selected {
+            border-color: var(--primary); background: var(--primary-light);
+        }
+        .feature-item.deselected {
+            opacity: 0.45; border-style: dashed;
+        }
+        .feature-item .fi-check {
+            position: absolute; top: 5px; right: 5px; width: 14px; height: 14px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .feature-item.selected .fi-check {
+            background: var(--primary); color: var(--surface);
+        }
+        .feature-item.deselected .fi-check {
+            background: var(--border); color: var(--text-muted);
+        }
+        .feature-item.locked .fi-check {
+            background: var(--amber); color: var(--surface);
+        }
+        .feature-item .fi-icon { margin-bottom: 4px; }
+        .feature-item .fi-icon .icon { width: 20px; height: 20px; color: var(--text-muted); }
+        .feature-item.selected .fi-icon .icon { color: var(--primary); }
+        .feature-item .fi-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .feature-item.selected .fi-title { color: var(--primary); }
+        .section-counter {
+            text-align: center; font-size: 12px; color: var(--text-muted);
+            margin-top: 8px; width: 100%; max-width: 520px;
+        }
+
+        .footer {
+            position: relative; z-index: 1;
+            text-align: center; padding: 24px;
+            color: var(--text-muted); font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .nav { padding: 16px 20px 0 0; }
+            .upload-card { padding: 24px; }
+            .drop-zone { padding: 32px 16px; }
+            .features { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        }
+
+        /* ===== ANALYZING OVERLAY ===== */
+        .analyzing-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            display: none; align-items: center; justify-content: center;
+            background: var(--overlay);
+            backdrop-filter: blur(6px);
+        }
+        .analyzing-overlay.show { display: flex; }
+
+        .analyzing-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 40px; max-width: 420px;
+            width: 90%; text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .analyzing-spinner {
+            width: 48px; height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .analyzing-card h2 {
+            font-size: 18px; font-weight: 600; color: var(--text);
+            margin-bottom: 4px;
+        }
+        .analyzing-card .analyzing-sub {
+            font-size: 13px; color: var(--text-muted); margin-bottom: 28px;
+        }
+
+        .analyzing-steps { text-align: left; margin-bottom: 24px; }
+        .step-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            margin-bottom: 4px; transition: all 0.2s ease;
+            opacity: 0.35;
+        }
+        .step-item .step-icon { flex-shrink: 0; }
+        .step-item .step-icon .icon { width: 18px; height: 18px; }
+        .step-item .step-label { font-size: 13px; font-weight: 500; color: var(--text); }
+        .step-item.active { opacity: 1; background: var(--primary-light); }
+        .step-item.active .step-icon .icon { color: var(--primary); }
+        .step-item.done { opacity: 0.6; }
+        .step-item.done .step-icon .icon { color: var(--green); }
+        .step-item.pending { opacity: 0.3; }
+
+        .analyzing-hint { font-size: 12px; color: var(--text-muted); }
+
+        /* ===== PROVIDER TOGGLE ===== */
+        .provider-wrap { margin-top: 14px; display: none; }
+        .provider-toggle {
+            display: flex; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); overflow: hidden;
+        }
+        .provider-toggle label {
+            flex: 1; text-align: center; padding: 8px 12px; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: var(--text-secondary);
+            transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .provider-toggle label .icon { width: 16px; height: 16px; }
+        .provider-toggle input { display: none; }
+        .provider-toggle input:checked + label {
+            background: var(--primary); color: var(--surface);
+        }
+
+        .title-field { margin-top: 14px; display: none; }
+        .title-field label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 6px;
+        }
+        .title-field input {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: var(--radius-sm); background: var(--bg); color: var(--text);
+            font-size: 14px; font-family: inherit; outline: none;
+            transition: all var(--transition); box-sizing: border-box;
+        }
+        .title-field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+        /* ===== FORCE RE-ANALYZE ===== */
+        .reanalyze-field { margin-top: 12px; display: none; }
+        .reanalyze-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-secondary); cursor: pointer;
+            padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); transition: all var(--transition);
+        }
+        .reanalyze-label:hover { border-color: var(--primary); }
+        .reanalyze-label input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+
+        /* ===== AMENDMENT / CASE LINKING ===== */
+        .case-field { margin-top: 12px; }
+        .case-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-secondary);
+            padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); transition: all var(--transition);
+        }
+        .case-label:hover { border-color: var(--primary); }
+        .case-label .case-hint { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+        .case-select {
+            flex: 1; min-width: 0;
+            padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--surface); color: var(--text); font-size: 13px; font-family: inherit;
+            outline: none; transition: all var(--transition);
+        }
+        .case-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    </style>
+</head>
+<body>
+    <div class="page-loader" id="pageLoader"><div class="loader-spinner"></div></div>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-package" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon" id="themeIconMoon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+        <a href="/company_profile">Company Profile</a>
+    </nav>
+
+    <div class="main-container page-enter">
+        <div class="hero">
+            <h1>
+                <svg width="36" height="36" viewBox="0 0 64 64" style="flex-shrink:0">
+                    <rect width="64" height="64" rx="12" fill="var(--primary)"/>
+                    <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                RFP Intelligence Portal
+            </h1>
+            <p>Upload your RFP document and let AI extract deliverables, evaluation criteria, risks, timelines, and compliance requirements.</p>
+        </div>
+
+        <div class="upload-card">
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload RFP document">
+                    <div class="drop-zone-content">
+                        <div class="icon-wrap">
+                            <svg class="icon icon-lg" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="main-label"><span>Choose files</span> or drag &amp; drop</div>
+                        <div class="sub-label">PDF, DOCX, or TXT (multiple files supported)</div>
+                    </div>
+                    <input type="file" name="rfp_file" id="rfp_file" accept=".pdf,.docx,.txt" multiple>
+                </div>
+
+                <div class="file-preview" id="filePreview">
+                    <div class="file-badges" id="fileBadges"></div>
+                    <div class="file-summary" id="fileSummary"></div>
+                    <button type="button" class="file-remove" id="fileRemove">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="title-field" id="titleField">
+                    <label>
+                        Analysis Name
+                    </label>
+                    <input type="text" name="analysis_title" id="analysisTitle" placeholder="e.g. Cloud Migration RFP">
+                </div>
+
+                <div class="provider-wrap" id="providerWrap">
+                    <div class="provider-toggle">
+                        <input type="radio" name="provider" id="provGemini" value="gemini">
+                        <label for="provGemini">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Gemini
+                        </label>
+                        <input type="radio" name="provider" id="provOpenrouter" value="openrouter" checked>
+                        <label for="provOpenrouter">
+                            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            OpenRouter (Free)
+                        </label>
+                    </div>
+                </div>
+
+                <input type="hidden" name="sections" id="sectionsInput" value="summary,deliverables,evaluation_criteria,compliance,risks,timeline,key_requirements,go_nogo,strategic_checklist">
+
+                <div class="reanalyze-field" id="reanalyzeField">
+                    <label class="reanalyze-label">
+                        <input type="checkbox" name="force_reanalyze" id="forceReanalyze">
+                        <span>Force fresh analysis (ignore cached result for this identical document)</span>
+                    </label>
+                </div>
+
+                <div class="case-field" id="caseField">
+                    <label class="case-label">
+                        <span class="case-hint">Amendment of case</span>
+                        <select name="amends_case" id="amendsCase" class="case-select">
+                            <option value="">(standalone — not an amendment)</option>
+                            {% for c in cases %}
+                            <option value="{{ c.id }}">{{ c.title or c.filename }} — {{ c.timestamp[:10] }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+
+                <button type="submit" class="analyze-btn" id="analyzeBtn" disabled>
+                    <span class="btn-content">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Analyze Document</span>
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <div class="features" id="sectionCards">
+            <div class="feature-item selected locked" data-section="summary">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Summary</div>
+            </div>
+            <div class="feature-item selected" data-section="deliverables">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Deliverables</div>
+            </div>
+            <div class="feature-item selected" data-section="evaluation_criteria">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Evaluation</div>
+            </div>
+            <div class="feature-item selected" data-section="compliance">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Compliance</div>
+            </div>
+            <div class="feature-item selected" data-section="risks">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Risks</div>
+            </div>
+            <div class="feature-item selected" data-section="timeline">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Timeline</div>
+            </div>
+            <div class="feature-item selected" data-section="key_requirements">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Key Req.</div>
+            </div>
+            <div class="feature-item selected" data-section="go_nogo">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Go / No-Go</div>
+            </div>
+            <div class="feature-item selected" data-section="strategic_checklist">
+                <div class="fi-check"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-icon"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fi-title">Checklist</div>
+            </div>
+            <div class="section-counter" id="sectionCounter">All 9 sections selected</div>
+        </div>
+    </div>
+
+    <div class="analyzing-overlay" id="analyzingOverlay">
+        <div class="analyzing-card">
+            <div class="analyzing-spinner"></div>
+            <h2>Analyzing Document</h2>
+            <div class="analyzing-sub">Please wait while we process your RFP</div>
+            <div class="analyzing-steps">
+                <div class="step-item" data-step="0">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Extracting text from document</div>
+                </div>
+                <div class="step-item" data-step="1">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="9" width="6" height="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label" id="stepAiLabel">Running AI analysis (Gemini 2.5 Flash)</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Evaluating compliance &amp; risks</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-icon"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <div class="step-label">Finalizing report</div>
+                </div>
+            </div>
+            <div class="analyzing-hint">Large documents may take 1&ndash;3 minutes for thorough analysis</div>
+        </div>
+    </div>
+
+    <div class="footer">RFP Automation Portal &mdash; Powered by Bilal (Team Lead), Isra Asif &amp; Maria Khan</div>
+
+    <div class="toast" id="toast">
+        <svg class="icon toast-icon" style="color:var(--green)" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="toast-msg"></span>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            var moonIcon = document.getElementById('themeIconMoon');
+            if (moonIcon && theme === 'dark') {
+                moonIcon.outerHTML = '<svg class="icon" id="themeIconMoon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            }
+
+            var dropZone = document.getElementById('dropZone');
+            var fileInput = document.getElementById('rfp_file');
+            var filePreview = document.getElementById('filePreview');
+            var fileRemove = document.getElementById('fileRemove');
+            var analyzeBtn = document.getElementById('analyzeBtn');
+            var form = document.getElementById('uploadForm');
+            var toast = document.getElementById('toast');
+            var overlay = document.getElementById('analyzingOverlay');
+            var stepItems = overlay.querySelectorAll('.step-item');
+            var droppedFiles = null;
+
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' bytes';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+
+            function showToast(msg, isError) {
+                toast.className = 'toast' + (isError ? ' error' : '');
+                var iconSvg = toast.querySelector('.toast-icon');
+                iconSvg.outerHTML = isError
+                    ? '<svg class="icon toast-icon" viewBox="0 0 24 24" style="color:var(--red)"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/></svg>'
+                    : '<svg class="icon toast-icon" viewBox="0 0 24 24" style="color:var(--green)"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                toast.querySelector('.toast-msg').textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 18000);
+            }
+
+            function handleFiles(files) {
+                var titleField = document.getElementById('titleField');
+                var providerWrap = document.getElementById('providerWrap');
+                var reanalyzeField = document.getElementById('reanalyzeField');
+                var badges = document.getElementById('fileBadges');
+                var summary = document.getElementById('fileSummary');
+                if (!files || files.length === 0) {
+                    filePreview.classList.remove('show');
+                    analyzeBtn.classList.remove('show');
+                    titleField.style.display = 'none';
+                    if (providerWrap) providerWrap.style.display = 'none';
+                    if (reanalyzeField) reanalyzeField.style.display = 'none';
+                    analyzeBtn.disabled = true;
+                    return;
+                }
+                badges.innerHTML = '';
+                var totalSize = 0;
+                for (var i = 0; i < files.length; i++) {
+                    var f = files[i];
+                    totalSize += f.size;
+                    var badge = document.createElement('div');
+                    badge.className = 'file-badge';
+                    badge.innerHTML = '<svg class="badge-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge-name">' + f.name + '</span><span class="badge-size">(' + formatSize(f.size) + ')</span>';
+                    badges.appendChild(badge);
+                }
+                summary.textContent = files.length + ' file' + (files.length > 1 ? 's' : '') + ' (' + formatSize(totalSize) + ')';
+                filePreview.classList.add('show');
+                titleField.style.display = 'block';
+                if (providerWrap) providerWrap.style.display = 'block';
+                if (reanalyzeField) reanalyzeField.style.display = 'block';
+                analyzeBtn.classList.add('show');
+                analyzeBtn.disabled = false;
+                var titleInput = document.getElementById('analysisTitle');
+                if (!titleInput.value) {
+                    titleInput.value = files[0].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+                }
+            }
+
+            function resetSteps() {
+                stepItems.forEach(function(el) { el.className = 'step-item pending'; });
+            }
+
+            function advanceStep(stepIndex) {
+                stepItems.forEach(function(el, i) {
+                    if (i < stepIndex) el.className = 'step-item done';
+                    else if (i === stepIndex) el.className = 'step-item active';
+                    else el.className = 'step-item pending';
+                });
+            }
+
+            dropZone.addEventListener('click', function() { fileInput.click(); });
+            dropZone.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+            fileInput.addEventListener('change', function(e) {
+                droppedFiles = null;
+                handleFiles(e.target.files);
+            });
+
+            dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+            dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                var files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    var valid = ['pdf', 'docx', 'txt'];
+                    for (var i = 0; i < files.length; i++) {
+                        var ext = files[i].name.split('.').pop().toLowerCase();
+                        if (!valid.includes(ext)) { showToast(files[i].name + ' is not supported. Use PDF, DOCX, or TXT.', true); return; }
+                        if (files[i].size > 50 * 1024 * 1024) { showToast(files[i].name + ' is too large (max 50MB).', true); return; }
+                    }
+                    droppedFiles = files;
+                    handleFiles(files);
+                }
+            });
+
+            document.querySelectorAll('input[name="provider"]').forEach(function(el) {
+                el.addEventListener('change', function() {
+                    var label = document.getElementById('stepAiLabel');
+                    label.textContent = this.value === 'openrouter' ? 'Running AI analysis (OpenRouter Free Model)' : 'Running AI analysis (Gemini 2.5 Flash)';
+                });
+            });
+
+            var sectionCards = document.querySelectorAll('#sectionCards .feature-item:not(.locked)');
+            var sectionsInput = document.getElementById('sectionsInput');
+            var sectionCounter = document.getElementById('sectionCounter');
+            function updateSections() {
+                var selected = [];
+                document.querySelectorAll('#sectionCards .feature-item').forEach(function(c) {
+                    if (c.classList.contains('selected')) selected.push(c.getAttribute('data-section'));
+                });
+                sectionsInput.value = selected.join(',');
+                var total = document.querySelectorAll('#sectionCards .feature-item').length;
+                var count = selected.length;
+                sectionCounter.textContent = count === total ? 'All ' + total + ' sections selected' : count + ' of ' + total + ' sections selected';
+            }
+            sectionCards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    this.classList.toggle('deselected');
+                    updateSections();
+                });
+            });
+
+            fileRemove.addEventListener('click', function() {
+                fileInput.value = '';
+                droppedFiles = null;
+                handleFiles(null);
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var activeFiles = droppedFiles || fileInput.files;
+                if (!activeFiles || activeFiles.length === 0) { showToast('Please select at least one file.', true); return; }
+                var selectedSects = sectionsInput.value.split(',').filter(Boolean);
+                if (selectedSects.length === 0) { showToast('Please select at least one analysis section.', true); return; }
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.disabled = true;
+                resetSteps();
+                advanceStep(0);
+                overlay.classList.add('show');
+
+                var fd = new FormData();
+                fd.append('analysis_title', document.getElementById('analysisTitle').value);
+                fd.append('provider', document.querySelector('input[name="provider"]:checked').value);
+                fd.append('sections', sectionsInput.value);
+                fd.append('force_reanalyze', document.getElementById('forceReanalyze').checked ? '1' : '');
+                fd.append('amends_case', document.getElementById('amendsCase').value);
+                for (var i = 0; i < activeFiles.length; i++) {
+                    fd.append('rfp_file', activeFiles[i]);
+                }
+                var stepInterval = setInterval(function() {
+                    var active = overlay.querySelector('.step-item.active');
+                    if (active) {
+                        var next = active.nextElementSibling;
+                        if (next) {
+                            var idx = parseInt(next.getAttribute('data-step'), 10);
+                            advanceStep(idx);
+                        }
+                    }
+                }, 3000);
+
+                fetch('/upload', { method: 'POST', body: fd })
+                    .then(function(r) {
+                        if (!r.ok) return r.text().then(function(txt) { throw new Error(txt || r.statusText); });
+                        return r.text();
+                    })
+                    .then(function(html) {
+                        clearInterval(stepInterval);
+                        advanceStep(4);
+                        setTimeout(function() {
+                            document.open(); document.write(html); document.close();
+                        }, 600);
+                    })
+                    .catch(function(err) {
+                        clearInterval(stepInterval);
+                        overlay.classList.remove('show');
+                        analyzeBtn.classList.remove('loading');
+                        analyzeBtn.disabled = false;
+                        showToast(err.message || 'Analysis failed. Please try again.', true);
+                    });
+            });
+        })();
+    </script>
+    <script>
+        window.addEventListener('load', function() {
+            var loader = document.getElementById('pageLoader');
+            if (loader) loader.classList.add('hidden');
+        });
+        if (document.readyState === 'complete') {
+            var loader = document.getElementById('pageLoader');
+            if (loader) loader.classList.add('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            var a = e.target.closest('a');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+            var loader = document.getElementById('pageLoader');
+            if (loader) { loader.classList.remove('hidden'); }
+        });
+    </script>
+</body>
+</html>

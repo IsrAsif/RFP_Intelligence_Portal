@@ -1,0 +1,96 @@
+{
+  "company_name": "Apex Solutions Inc.",
+  "certifications": [
+    {
+      "name": "ISO 9001:2015",
+      "number": "QMS-2024-0847",
+      "expiry": "2027-06-30",
+      "scope": "Quality Management Systems for IT Services"
+    }
+  ],
+  "insurance": [
+    {
+      "type": "General Liability",
+      "coverage_amount": 5000000,
+      "provider": "Hartford Financial",
+      "policy_number": "GL-ODU-2025-7891",
+      "expiry": "2026-12-31"
+    }
+  ],
+  "payment_terms": {
+    "standard_terms": "NET30",
+    "accepted_terms": [
+      "NET15",
+      "NET30",
+      "NET45"
+    ],
+    "notes": "Prefer NET30"
+  },
+  "past_performance": [
+    {
+      "client": "Virginia Tech",
+      "project": "Enterprise Search Platform Modernization",
+      "value": 4200000,
+      "start_date": "2023-06",
+      "end_date": "2025-01",
+      "description": "AI-powered site search",
+      "contact": "Dr. Sarah Chen"
+    }
+  ],
+  "technical_capabilities": [
+    {
+      "name": "AI-Powered Enterprise Search",
+      "description": "Full-stack search with Elasticsearch and NLP",
+      "technologies": [
+        "E",
+        "l",
+        "a",
+        "s",
+        "t",
+        "i",
+        "c",
+        "s",
+        "e",
+        "a",
+        "r",
+        "c",
+        "h",
+        "P",
+        "y",
+        "t",
+        "h",
+        "o",
+        "n",
+        "R",
+        "e",
+        "a",
+        "c",
+        "t"
+      ],
+      "certifications_required": []
+    }
+  ],
+  "financial_standing": {
+    "annual_revenue": 48000000,
+    "years_in_business": 18,
+    "duns_number": "07-843-2190",
+    "bonding_capacity": 25000000,
+    "credit_rating": "A+"
+  },
+  "personnel": [
+    {
+      "name": "David Richardson",
+      "role": "CEO / Program Director",
+      "certifications": [
+        "P",
+        "M",
+        "P",
+        "P",
+        "g",
+        "M",
+        "P"
+      ],
+      "experience_years": 22
+    }
+  ]
+}

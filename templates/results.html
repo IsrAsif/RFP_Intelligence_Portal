@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFP Analysis Results</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .header {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 20px 24px; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+        }
+        .header-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-left .back-btn {
+            text-decoration: none; color: var(--text-secondary);
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; transition: all var(--transition);
+        }
+        .header-left .back-btn:hover { background: var(--primary-light); color: var(--primary); }
+        .header-left .back-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .header-left .title-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .header-left .analysis-title { font-size: 18px; font-weight: 700; color: var(--text); }
+        .header-left .file-badge {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            background: var(--bg); padding: 4px 10px; border-radius: 100px;
+        }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .actions-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .actions-divider { width: 1px; height: 26px; background: var(--border); margin: 0 2px; }
+
+        .btn .btn-chev { width: 14px; height: 14px; margin-left: 2px; transition: transform var(--transition); }
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; right: 0; top: calc(100% + 6px);
+            min-width: 230px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            box-shadow: var(--shadow-lg); padding: 6px; z-index: 60;
+            opacity: 0; visibility: hidden; transform: translateY(-4px);
+            transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+        }
+        .dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown.open .btn-chev { transform: rotate(180deg); }
+        .dropdown-menu form { margin: 0; }
+        .dropdown-menu button {
+            width: 100%; display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border: none; background: transparent; color: var(--text);
+            font-size: 13px; font-weight: 500; font-family: inherit; text-align: left;
+            border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition);
+        }
+        .dropdown-menu button:hover { background: var(--primary-light); color: var(--primary); }
+        .dropdown-menu button:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+        .dropdown-menu .dm-label {
+            display: block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted); padding: 8px 10px 4px;
+        }
+        .dropdown-menu .dm-hint { display: block; font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 26px; }
+        .dropdown-menu .dm-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+        .search-bar {
+            max-width: 1100px; margin: 16px auto 0; position: relative;
+        }
+        .search-bar input {
+            width: 100%; padding: 10px 16px 10px 40px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--bg); color: var(--text); font-size: 14px;
+            font-family: inherit; outline: none; transition: all var(--transition);
+        }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .search-bar .search-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); pointer-events: none;
+        }
+
+        .main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+        .summary-banner {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow);
+        }
+        .summary-banner .sb-head {
+            font-size: 14px; font-weight: 600; color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .summary-banner p { font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+
+        .version-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; box-shadow: var(--shadow);
+        }
+        .version-card .vc-head {
+            display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text);
+            margin-bottom: 12px;
+        }
+        .version-card .vc-head .vc-count {
+            font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg);
+            padding: 2px 8px; border-radius: 100px;
+        }
+        .version-list { display: flex; flex-direction: column; gap: 8px; }
+        .version-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+            padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--bg); text-decoration: none; transition: all var(--transition);
+        }
+        .version-item:hover { border-color: var(--primary); background: var(--primary-light); }
+        .version-item.current { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .version-item .vi-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .version-item .vi-badge {
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+            padding: 3px 8px; border-radius: 100px; flex-shrink: 0;
+        }
+        .version-item .vi-badge.baseline { background: var(--green-light); color: var(--green); }
+        .version-item .vi-badge.amend { background: var(--primary-light); color: var(--primary); }
+        .version-item .vi-title { font-size: 13px; font-weight: 600; color: var(--text); }
+        .version-item.current .vi-title { color: var(--primary); }
+        .version-item .vi-meta { font-size: 11px; color: var(--text-muted); }
+        .version-item .vi-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .version-item .vi-summary { font-size: 12px; color: var(--text-secondary); max-width: 420px; line-height: 1.5; }
+        .vi-chip { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; flex-shrink: 0; }
+        .vi-chip.high { background: var(--red-light); color: var(--red); }
+        .vi-chip.low { background: var(--amber-light); color: var(--amber); }
+
+        .tabs-wrapper { position: relative; margin-bottom: 24px; }
+        .tabs-wrap-inner { position: relative; }
+        .tabs {
+            display: flex; gap: 4px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 4px; overflow-x: auto;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .tabs::-webkit-scrollbar { height: 0; transition: height 0.25s ease; }
+        .tabs:hover::-webkit-scrollbar { height: 5px; }
+        .tabs::-webkit-scrollbar-track { background: transparent; }
+        .tabs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        .tabs::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        .tabs-fade {
+            position: absolute; top: 0; right: 0; bottom: 0;
+            width: 48px;
+            background: linear-gradient(to right, transparent, var(--surface));
+            pointer-events: none; z-index: 1;
+            opacity: 0; transition: opacity 0.3s ease;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .tabs-fade.show { opacity: 1; }
+        .tab-scroll-arrow {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-secondary); cursor: pointer; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: all 0.25s ease; box-shadow: var(--shadow);
+            font-size: 14px; font-weight: 700; font-family: inherit; line-height: 1;
+            padding: 0;
+        }
+        .tab-scroll-arrow.visible { opacity: 1; }
+        .tab-scroll-arrow:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .tab-scroll-arrow:active { transform: translateY(-50%) scale(0.92); }
+        .tab-btn {
+            padding: 10px 20px; border: none; background: transparent;
+            color: var(--text-secondary); font-size: 14px; font-weight: 500;
+            font-family: inherit; cursor: pointer; border-radius: 6px;
+            transition: all var(--transition); white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .tab-btn:hover { background: var(--bg); color: var(--text); }
+        .tab-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .tab-btn.active { background: var(--primary); color: var(--surface); box-shadow: 0 2px 8px var(--primary-glow); }
+        .tab-btn .count {
+            font-size: 11px; background: rgba(0,0,0,0.08);
+            padding: 1px 7px; border-radius: 100px;
+        }
+        .tab-btn.active .count { background: rgba(255,255,255,0.2); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow);
+        }
+        .section-card h3 {
+            font-size: 15px; font-weight: 600; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-card .list { list-style: none; }
+        .module4-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+        @media (max-width: 800px) { .module4-grid { grid-template-columns: 1fr; } }
+        .module4-panel { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+        .module4-panel h4 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .module4-panel .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--gradient); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity var(--transition); }
+        .module4-panel .btn:hover { opacity: 0.92; }
+        .module4-panel .btn:disabled { opacity: 0.5; cursor: default; }
+        .module4-panel .btn svg { flex-shrink: 0; }
+        .m4-draft { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 13px; font-family: inherit; line-height: 1.5; box-sizing: border-box; outline: none; resize: vertical; margin-bottom: 10px; transition: all var(--transition); }
+        .m4-draft:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .m4-row { display: flex; gap: 8px; }
+        .m4-status { font-size: 12px; color: var(--text-muted); margin: 10px 0 4px; min-height: 16px; }
+        .m4-status .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(0,0,0,0.15); border-top-color: currentColor; border-radius: 50%; animation: m4spin 0.8s linear infinite; vertical-align: -2px; margin-right: 6px; }
+        @keyframes m4spin { to { transform: rotate(360deg); } }
+        .m4-qa-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+        .m4-qa-q { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+        .m4-qa-q::before { content: 'Q: '; color: var(--primary); }
+        .m4-qa-a { font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+        .m4-qa-a::before { content: 'A: '; color: var(--text-muted); font-weight: 600; }
+        .m4-qa-c { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .m4-tone-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+        .m4-tone-box h5 { margin: 0 0 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .m4-tone-box p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+        .section-card .list li {
+            padding: 10px 14px; background: var(--bg); border-radius: 8px;
+            margin-bottom: 6px; font-size: 14px; line-height: 1.5;
+            color: var(--text-secondary); border-left: 3px solid var(--primary);
+            transition: all var(--transition);
+        }
+        .section-card .list li:hover { background: var(--surface-hover); }
+
+        /* ===== TREE VIEW FOR DELIVERABLES ===== */
+        .tree { list-style: none; padding: 0; margin: 0; }
+        .tree-parent {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+            box-shadow: var(--shadow); transition: all var(--transition);
+        }
+        .tree-parent-label {
+            padding: 12px 16px; font-weight: 700; font-size: 14px;
+            color: var(--text); background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; user-select: none;
+            transition: background var(--transition);
+        }
+        .tree-parent-label:hover { background: var(--primary-light); }
+        .tree-parent-label .toggle-icon {
+            width: 16px; height: 16px; flex-shrink: 0;
+            color: var(--text-muted); transition: transform 0.2s ease;
+        }
+        .tree-parent.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .tree-parent-label .parent-accent {
+            width: 4px; height: 20px; border-radius: 2px;
+            background: var(--primary); flex-shrink: 0;
+        }
+        .tree-parent-label .label-text { flex: 1; }
+        .tree-children {
+            list-style: none; padding: 0; margin: 0;
+            transition: all 0.2s ease;
+        }
+        .tree-parent.collapsed .tree-children { display: none; }
+        .tree-ref, .tree-child-ref {
+            font-size: 10px; line-height: 1.4; margin: 4px 0 6px 36px; padding: 5px 8px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+            display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center;
+            max-width: 92%; box-shadow: var(--shadow);
+        }
+        .tree-child-ref { margin-left: 58px; }
+        .tree-ref .ref-file, .tree-child-ref .ref-file {
+            display: inline-block; background: var(--primary-light); color: var(--primary);
+            font-weight: 700; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-sec, .tree-child-ref .ref-sec {
+            display: inline-block; background: var(--green-light); color: var(--green);
+            font-weight: 600; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-page, .tree-child-ref .ref-page {
+            display: inline-block; background: var(--amber-light); color: var(--amber);
+            font-weight: 600; padding: 1px 7px; border-radius: 4px; font-size: 9px;
+        }
+        .tree-ref .ref-desc, .tree-child-ref .ref-desc {
+            display: inline-block; color: var(--text-muted); font-size: 9px;
+            padding: 1px 4px;
+        }
+        .tree-child {
+            padding: 6px 12px 6px 36px; font-size: 13px;
+            color: var(--text-secondary); line-height: 1.5;
+            position: relative;
+        }
+        .tree-child:hover {
+            color: var(--text); background: var(--bg);
+        }
+        /* L-shape branch: vertical line down + horizontal arm */
+        .tree-child::before {
+            content: '';
+            position: absolute; left: 16px; top: 0;
+            width: 12px; height: 13px;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        /* Vertical continuation below L-shape for non-last children */
+        .tree-child::after {
+            content: '';
+            position: absolute; left: 16px; top: 13px;
+            bottom: 0; width: 1px;
+            background: var(--border);
+        }
+        .tree-child:last-child::after { display: none; }
+        .section-card .empty-state {
+            text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px;
+        }
+
+        .risk-card {
+            padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 8px;
+            border-left: 4px solid; display: flex; align-items: flex-start; gap: 12px;
+        }
+        .risk-card.severity-high { background: var(--red-light); border-color: var(--red); }
+        .risk-card.severity-medium { background: var(--amber-light); border-color: var(--amber); }
+        .risk-card.severity-low { background: var(--green-light); border-color: var(--green); }
+        .risk-card .risk-severity {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+        }
+        .risk-card.severity-high .risk-severity { background: var(--red); color: #fff; }
+        .risk-card.severity-medium .risk-severity { background: var(--amber); color: #fff; }
+        .risk-card.severity-low .risk-severity { background: var(--green); color: #fff; }
+        .risk-card .risk-category { font-weight: 600; font-size: 14px; }
+        .risk-card .risk-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .risk-card .risk-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+        .timeline-item {
+            display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .timeline-item:last-child { border-bottom: none; }
+        .timeline-item .tl-dot {
+            width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
+            margin-top: 4px; flex-shrink: 0; box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        .timeline-item .tl-milestone { font-weight: 600; font-size: 14px; }
+        .timeline-item .tl-date { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        .compliance-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;
+        }
+        .compliance-card {
+            padding: 18px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: var(--bg);
+            transition: all var(--transition);
+        }
+        .compliance-card:hover { border-color: var(--border-strong); }
+        .compliance-card .cc-title {
+            font-weight: 600; font-size: 14px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .compliance-card .cc-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+        .key-req-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .key-req-item:last-child { border-bottom: none; }
+        .key-req-item .kr-num {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--primary);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .key-req-item .kr-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* ===== MODULE 4 — Response Library suggestions ===== */
+        .m4sug-panel { flex-basis: 100%; margin-top: 2px; }
+        .m4sug-card { display: flex; flex-direction: column; gap: 7px; padding: 12px 14px; margin: 6px 0 8px 0; border: 1px solid var(--primary-glow); background: var(--primary-light); border-radius: 10px; }
+        .m4sug-head { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); }
+        .m4sug-score { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--primary); background: var(--surface); border: 1px solid var(--primary-glow); padding: 2px 8px; border-radius: 100px; }
+        .m4sug-src { font-size: 11px; color: var(--text-muted); }
+        .m4sug-q { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .m4sug-q::before { content: 'Q: '; color: var(--primary); }
+        .m4sug-a { font-size: 13px; color: var(--text); line-height: 1.5; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+        .m4sug-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .m4sug-btn { padding: 6px 14px; font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; border: none; font-family: inherit; font-weight: 600; background: var(--gradient); color: #fff; }
+        .m4sug-btn.ghost { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
+        .m4sug-btn:disabled { opacity: 0.5; cursor: default; }
+        .m4sug-none { font-size: 11px; color: var(--text-muted); margin: 2px 0; }
+        .m4sug-draft-wrap { flex-basis: 100%; margin: 6px 0 8px 0; display: flex; flex-direction: column; gap: 8px; }
+        .m4sug-draft { width: 100%; min-height: 120px; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 13px; font-family: inherit; line-height: 1.6; resize: vertical; outline: none; }
+        .m4sug-draft:focus { border-color: var(--primary); }
+        .m4sug-hint { font-size: 11px; color: var(--text-muted); }
+
+
+
+        @media (max-width: 768px) {
+            .header { padding: 14px 16px; }
+            .header-left h1 { font-size: 15px; }
+            .main { padding: 16px; }
+            .compliance-grid { grid-template-columns: 1fr; }
+            .tab-btn { padding: 8px 14px; font-size: 13px; }
+            .actions-divider { display: none; }
+            .dropdown-menu { min-width: 200px; }
+        }
+
+        /* ===== GO / NO-GO TAB ===== */
+        .go-score-wrap {
+            display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+        }
+        .go-gauge {
+            position: relative; width: 140px; height: 140px; flex-shrink: 0;
+        }
+        .go-gauge svg { transform: rotate(-90deg); }
+        .go-gauge .track { fill: none; stroke: var(--border); stroke-width: 8; }
+        .go-gauge .arc {
+            fill: none; stroke-width: 8; stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease;
+        }
+        .go-gauge-label {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .go-gauge-label .pct { font-size: 32px; font-weight: 800; line-height: 1; }
+        .go-gauge-label .pct-label {
+            font-size: 11px; color: var(--text-muted); margin-top: 2px;
+        }
+        .go-verdict {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 14px; border-radius: 100px; font-size: 13px; font-weight: 700;
+        }
+        .go-verdict.go { background: var(--green-light); color: var(--green); }
+        .go-verdict.caution { background: var(--amber-light); color: var(--amber); }
+        .go-verdict.nogo { background: var(--red-light); color: var(--red); }
+        .go-summary { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-top: 4px; flex: 1; }
+        .go-reasons { margin-top: 20px; }
+        .go-reason {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 8px;
+            border-left: 3px solid; background: var(--bg);
+        }
+        .go-reason .gr-icon { flex-shrink: 0; margin-top: 1px; }
+        .go-reason .gr-icon .icon { width: 18px; height: 18px; }
+        .go-reason .gr-body { flex: 1; }
+        .go-reason .gr-body .gr-factor {
+            font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;
+        }
+        .go-reason .gr-body .gr-detail { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .go-reason .gr-weight {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            padding: 1px 6px; border-radius: 100px;
+        }
+        .go-reason .gr-weight.high { background: var(--red-light); color: var(--red); }
+        .go-reason .gr-weight.medium { background: var(--amber-light); color: var(--amber); }
+        .go-reason .gr-weight.low { background: var(--green-light); color: var(--green); }
+
+        /* ===== STRATEGIC CHECKLIST ===== */
+        .sc-exec {
+            font-size: 15px; line-height: 1.7; color: var(--text-secondary);
+            background: var(--bg); border-radius: var(--radius-sm); padding: 16px;
+        }
+        .sc-section { border-left: 3px solid var(--primary); }
+        .sc-items { display: flex; flex-direction: column; gap: 8px; }
+        .sc-item {
+            background: var(--bg); border-radius: 8px; padding: 12px 16px;
+            border-left: 3px solid var(--border); transition: all var(--transition);
+        }
+        .sc-item:hover { background: var(--surface-hover); }
+        .sc-item-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+        }
+        .sc-item-name { font-weight: 600; font-size: 14px; color: var(--text); }
+        .sc-item-reason { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+        .sc-badge {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 2px 10px; border-radius: 100px; letter-spacing: 0.3px;
+        }
+        .sc-badge.go { background: var(--green-light); color: var(--green); }
+        .sc-badge.no-go { background: var(--red-light); color: var(--red); }
+        .sc-badge.escalate { background: var(--amber-light); color: var(--amber); }
+        .sc-badge.review { background: var(--primary-light); color: var(--primary); }
+        .sc-badge.caution { background: var(--amber-light); color: var(--amber); }
+        .sc-badge.not-specified-in-rfp { background: var(--border); color: var(--text-muted); }
+        .sc-detail { font-size: 13px; line-height: 1.6; margin-top: 8px; padding: 10px 12px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+        .sc-detail-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .sc-detail-label .icon { width: 14px; height: 14px; }
+        .sc-detail-text { color: var(--text-secondary); }
+        .sc-detail + .sc-detail { margin-top: 6px; }
+        .sc-rec { border-left: 3px solid var(--primary); }
+        .sc-analysis { border-left: 3px solid var(--amber); }
+        .sc-rfp-says { border-left: 3px solid var(--text-muted); }
+        .sc-evidence { border-left: 3px solid var(--green); }
+        .sc-risk { border-left: 3px solid var(--red); }
+        .sc-impact { border-left: 3px solid var(--amber); }
+        .sc-mitigation { border-left: 3px solid var(--primary); }
+        .deliv-toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .deliv-toc-head {
+            font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .deliv-toc-stats {
+            display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .deliv-toc-stat {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--text-secondary);
+        }
+        .deliv-toc-stat strong { font-size: 18px; color: var(--text); font-weight: 800; }
+        .deliv-toc-bar {
+            width: 160px; height: 8px; background: var(--border);
+            border-radius: 100px; overflow: hidden; position: relative;
+        }
+        .deliv-toc-bar-fill {
+            height: 100%; border-radius: 100px;
+            background: var(--green);
+            transition: width 0.6s ease;
+        }
+        .deliv-toc-anchors {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+            padding-top: 12px; border-top: 1px solid var(--border);
+        }
+        .deliv-toc-anchors a {
+            font-size: 12px; font-weight: 500; color: var(--primary);
+            text-decoration: none; padding: 6px 12px; border-radius: 100px;
+            background: var(--primary-light); transition: all var(--transition);
+        }
+        .deliv-toc-anchors a:hover { background: var(--primary); color: var(--surface); }
+        .deliv-toc-anchors a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        .risk-tag {
+            display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+            padding: 1px 8px; border-radius: 100px; letter-spacing: 0.3px; margin-left: 4px;
+        }
+        .risk-tag.high { background: var(--red-light); color: var(--red); }
+        .risk-tag.medium { background: var(--amber-light); color: var(--amber); }
+        .risk-tag.low { background: var(--green-light); color: var(--green); }
+        .sc-summary { border-left: 3px solid var(--primary); margin-bottom: 16px; }
+        .sc-summary-grid {
+            display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+        }
+        .sc-summary-item {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 12px 20px; border-radius: 10px; min-width: 90px;
+            background: var(--bg); border: 1px solid var(--border);
+        }
+        .sc-summary-count {
+            font-size: 28px; font-weight: 800; line-height: 1.1;
+        }
+        .sc-summary-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-top: 4px;
+        }
+        .sc-summary-item.go .sc-summary-count { color: var(--green); }
+        .sc-summary-item.no-go .sc-summary-count { color: var(--red); }
+        .sc-summary-item.review .sc-summary-count { color: var(--primary); }
+        .sc-summary-item.escalate .sc-summary-count { color: var(--amber); }
+        .sc-summary-item.caution .sc-summary-count { color: var(--amber); }
+        .sc-summary-item.not-specified .sc-summary-count { color: var(--text-muted); }
+        .sc-summary-item.go .sc-summary-label { color: var(--green); }
+        .sc-summary-item.no-go .sc-summary-label { color: var(--red); }
+        .sc-summary-item.review .sc-summary-label { color: var(--primary); }
+        .sc-summary-item.escalate .sc-summary-label { color: var(--amber); }
+        .sc-summary-item.caution .sc-summary-label { color: var(--amber); }
+        .sc-summary-item.not-specified .sc-summary-label { color: var(--text-muted); }
+        .sc-detail { border-left: 3px solid var(--border); padding-left: 10px; margin-top: 8px; }
+        .sc-detail.sc-evidence { border-left-color: var(--green); }
+        .sc-detail.sc-rfp-says { border-left-color: var(--text-muted); }
+        .sc-detail.sc-risk { border-left-color: var(--red); }
+        .sc-detail.sc-impact { border-left-color: var(--amber); }
+        .sc-detail.sc-mitigation { border-left-color: var(--primary); }
+        .sc-detail.sc-analysis { border-left-color: var(--amber); }
+        .sc-detail.sc-rec { border-left-color: var(--primary); }
+
+        .req-table-wrap { overflow-x: auto; margin-top: 12px; }
+        .req-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .req-table th { background: var(--bg); color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        .req-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .req-table tr:hover { background: var(--bg); }
+        .req-table .req-id { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; color: var(--primary); font-weight: 700; white-space: nowrap; }
+        .req-table .req-desc { max-width: 360px; line-height: 1.5; }
+        .req-table .req-section { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+        .req-table .req-page { font-size: 12px; color: var(--text-muted); text-align: center; }
+        .req-table select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--text); font-size: 12px; font-family: inherit; cursor: pointer; }
+        .req-table select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+        .req-status-yes { color: var(--green); font-weight: 600; }
+        .req-status-no { color: var(--red); font-weight: 600; }
+        .req-status-partial { color: var(--amber); font-weight: 600; }
+        .req-export-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .req-export-bar .btn { font-size: 12px; padding: 6px 14px; }
+        .req-filter { padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 13px; font-family: inherit; outline: none; }
+        .req-filter:focus { border-color: var(--primary); }
+
+        /* ===== MODULE 2 — Verification ===== */
+        .verify-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+        .verify-bar .btn { font-size: 12px; padding: 6px 14px; }
+        .verify-bar .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .verify-status { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .verify-status.go { background: var(--green-light); color: var(--green); }
+        .verify-status.no-go { background: var(--red-light); color: var(--red); }
+        .verify-status.escalate, .verify-status.review, .verify-status.caution { background: var(--amber-light); color: var(--amber); }
+        .verify-status.not-specified { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+        .verify-detail { margin-top: 8px; padding: 10px 14px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 13px; line-height: 1.6; display: none; }
+        .verify-detail.open { display: block; }
+        .verify-detail dt { font-weight: 600; color: var(--text-secondary); margin-top: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .verify-detail dt:first-child { margin-top: 0; }
+        .verify-detail dd { color: var(--text); margin: 2px 0 0 0; }
+        .verify-detail .cite-link { color: var(--primary); cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+        .verify-detail .cite-link:hover { text-decoration-style: solid; }
+        .req-table th.ver-col, .req-table td.ver-col { width: 100px; }
+        .checklist-verify { margin-top: 8px; padding: 10px 14px; background: var(--primary-light); border-radius: var(--radius-sm); border: 1px solid var(--primary-glow); font-size: 13px; line-height: 1.6; display: none; }
+        .checklist-verify.open { display: block; }
+        .checklist-verify dt { font-weight: 600; color: var(--primary); margin-top: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .checklist-verify dt:first-child { margin-top: 0; }
+        .checklist-verify dd { color: var(--text); margin: 2px 0 0 0; }
+        .checklist-verify .cite-link { color: var(--primary); cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+        .modal-overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 200; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: var(--surface); border-radius: var(--radius-lg); padding: 28px; max-width: 520px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+        .modal-box h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+        .modal-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+        .modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; }
+        .modal-close:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+    <div class="page-loader" id="pageLoader"><div class="loader-spinner"></div></div>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon" id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-left">
+                <a href="/" class="back-btn">
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <div>
+                    <div class="title-line">
+                        <svg width="28" height="28" viewBox="0 0 64 64" style="flex-shrink:0">
+                            <rect width="64" height="64" rx="12" fill="var(--primary)"/>
+                            <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                            <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                            <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="analysis-title">{{ record_title or filename }}</span>
+                        <span class="file-badge">{{ filename }}</span>
+                        <span class="file-badge" style="background:var(--primary-light);color:var(--primary)">{{ provider or 'gemini' }}</span>
+                        {% if record_id %}<span class="file-badge" title="API export ID" style="cursor:default;background:var(--bg);color:var(--text-muted)">ID: {{ record_id }}</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="actions-group">
+                    <div class="dropdown" id="exportDropdown">
+                        <button class="btn" id="exportBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Export
+                            <svg class="icon btn-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <div class="dropdown-menu" role="menu" aria-label="Export options">
+                            <span class="dm-label">Documents</span>
+                            <form action="/export_pdf" method="POST">
+                                <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                                <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                                <button type="submit" role="menuitem">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Full PDF report
+                                </button>
+                            </form>
+                            <form action="/export_deliverables_pdf" method="POST">
+                                <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                                <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                                <button type="submit" role="menuitem" title="Deliverables-only PDF with full references">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Deliverables-only PDF
+                                </button>
+                            </form>
+                            {% if results.get('requirements', []) | length > 0 %}
+                            <div class="dm-sep"></div>
+                            <span class="dm-label">Data</span>
+                            <form action="/export_requirements_xlsx" method="POST">
+                                <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                                <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                                <button type="submit" role="menuitem">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                                    Requirements (Excel)
+                                </button>
+                            </form>
+                            {% endif %}
+                            <form action="/export_json" method="POST">
+                                <input type="hidden" name="results_data" value='{{ results | tojson | safe }}'>
+                                <input type="hidden" name="filename" value="{{ record_title or filename }}">
+                                <button type="submit" role="menuitem">
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Raw JSON
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions-divider"></div>
+                <div class="actions-group">
+                    {% if record_id %}
+                    <button class="btn" id="extractReqBtn" onclick="extractRequirements()" title="Re-extract requirements for this document">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Extract
+                    </button>
+                    {% endif %}
+                    {% if results.get('requirements', []) | length > 0 %}
+                    <a href="/requirements/{{ record_id }}" class="btn" title="View extracted requirements">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Requirements ({{ results.get('requirements', []) | length }})
+                    </a>
+                    {% endif %}
+                    {% if record_id %}
+                    <a href="/module4/{{ record_id }}" class="btn" title="Repurpose requirements for a similar future RFP">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Smart Reuse
+                    </a>
+                    <a href="/module5/{{ record_id }}" class="btn" title="Crosswalk requirements to solicitation outline">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Compliance Shred
+                    </a>
+                    <a href="/sentinel/{{ record_id }}" class="btn btn-primary" title="Run Sentinel compliance verification">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                        Sentinel
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="search-bar">
+            <span class="search-icon">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <input type="text" id="searchInput" placeholder="Search across all sections..." oninput="filterResults(this.value)">
+        </div>
+    </header>
+
+    <div class="main page-enter">
+        <div class="summary-banner">
+            <div class="sb-head">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Executive Summary
+            </div>
+            <p>{{ results.get('summary', 'No summary available.') }}</p>
+        </div>
+
+        {% if versions and versions | length > 1 %}
+        <div class="version-card">
+            <div class="vc-head">
+                <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Version History
+                <span class="vc-count">{{ versions | length }} versions</span>
+            </div>
+            <div class="version-list">
+                {% for v in versions %}
+                <a href="/view/{{ v.id }}" class="version-item {% if v.is_current %}current{% endif %}">
+                    <div class="vi-left">
+                        <span class="vi-badge {% if v.is_baseline %}baseline{% else %}amend{% endif %}">{{ 'Baseline' if v.is_baseline else 'Amendment' }}</span>
+                        <div>
+                            <div class="vi-title">{{ v.title }} {% if v.is_current %}<span style="font-size:10px;color:var(--primary);font-weight:600">(viewing)</span>{% endif %}</div>
+                            <div class="vi-meta">{{ v.timestamp[:16] }} · {{ v.provider }}</div>
+                        </div>
+                    </div>
+                    <div class="vi-right">
+                        {% if v.summary %}<span class="vi-summary">{{ v.summary[:90] }}{% if v.summary|length > 90 %}&hellip;{% endif %}</span>{% endif %}
+                        {% if v.high_count is not none %}
+                        <span class="vi-chip high">{{ v.high_count }} high</span>
+                        <span class="vi-chip low">{{ v.low_count }} low</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if delta %}
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:var(--radius);padding:14px 16px;margin:0 0 20px 0;box-shadow:var(--shadow)">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+                <span style="font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:6px">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Amendment Delta
+                </span>
+                <span style="font-size:11px;color:var(--text-muted)">vs baseline “{{ delta.get('baseline_title', '') }}”</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--red-light);color:var(--red)">{{ delta.get('high_count', 0) }} high</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--amber-light);color:var(--amber)">{{ delta.get('low_count', 0) }} low</span>
+            </div>
+            {% if delta.get('summary') %}
+            <div style="font-size:13px;line-height:1.6;color:var(--text-secondary)">{{ delta.get('summary') }}</div>
+            {% endif %}
+            {% if delta.get('changes') %}
+            <div style="margin-top:8px;font-size:12px;color:var(--text-muted)">
+                <a href="/compare" onclick="event.preventDefault();var a=document.createElement('form');a.method='POST';a.action='/compare';var i1=document.createElement('input');i1.type='hidden';i1.name='record_1';i1.value='{{ delta.get('baseline_id','') }}';var i2=document.createElement('input');i2.type='hidden';i2.name='record_2';i2.value='{{ record_id }}';a.appendChild(i1);a.appendChild(i2);document.body.appendChild(a);a.submit();" style="color:var(--primary);text-decoration:none">Open full delta in Compare &rarr;</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if results.deliverables and results.deliverables[0] is mapping %}
+        {% set total_parents = results.deliverables | length %}
+        {% set total_children = namespace(v=0) %}
+        {% set ref_children = namespace(v=0) %}
+        {% for g in results.deliverables %}
+            {% if g.sub_deliverables is defined %}
+                {% for c in g.sub_deliverables %}
+                    {% set total_children.v = total_children.v + 1 %}
+                    {% set cr = c.reference if c.reference is defined else c.get('reference', '') %}
+                    {% if cr %}{% set ref_children.v = ref_children.v + 1 %}{% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        {% set pct = (ref_children.v / total_children.v * 100) | int if total_children.v > 0 else 0 %}
+        <div class="deliv-toc">
+            <div class="deliv-toc-head">
+                <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" fill="none"/><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" fill="none"/><line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                Deliverable Summary
+            </div>
+            <div class="deliv-toc-stats">
+                <span class="deliv-toc-stat"><strong>{{ total_parents }}</strong> parent groups</span>
+                <span class="deliv-toc-stat"><strong>{{ total_children.v }}</strong> sub-deliverables</span>
+                <span class="deliv-toc-stat">
+                    <strong>{{ pct }}%</strong> have references
+                    <span class="deliv-toc-bar"><span class="deliv-toc-bar-fill" style="width:{{ pct }}%"></span></span>
+                </span>
+            </div>
+            <div class="deliv-toc-anchors">
+                {% for g in results.deliverables %}
+                {% set pname = g.deliverable if g.deliverable is defined else g.get('deliverable', '') %}
+                <a href="#deliv-{{ loop.index }}">{{ loop.index }}. {{ pname }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% set sa = results.get('sections_analyzed', []) %}
+        {% set sa_display = sa | select('ne', 'summary') | list %}
+        {% if sa_display | length < 8 %}
+        <div class="section-card" style="margin-bottom:16px;padding:12px 20px;border-left:4px solid var(--amber);display:flex;align-items:center;gap:10px;">
+            <svg class="icon" style="flex-shrink:0;color:var(--amber)" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+            <span style="font-size:13px;color:var(--text-secondary)">Partial analysis: only <strong>{{ sa_display | join(', ') | replace('go_nogo','Go/No-Go') | replace('strategic_checklist','Checklist') | replace('evaluation_criteria','Evaluation') | replace('key_requirements','Key Req.') | replace('deliverables','Deliverables') | replace('compliance','Compliance') | replace('risks','Risks') | replace('timeline','Timeline') }}</strong> were analyzed.</span>
+        </div>
+        {% endif %}
+
+        <div class="tabs-wrapper">
+            <div class="tabs-wrap-inner">
+                <div class="tabs" id="tabContainer">
+            {% if 'deliverables' in sa %}
+            <button class="tab-btn active" data-tab="deliverables">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Deliverables <span class="count">{% if results.deliverables and results.deliverables[0] is mapping %}{% set dcount = results.deliverables | length %}{% set ccount = namespace(v=0) %}{% for d in results.deliverables %}{% if d.sub_deliverables is defined %}{% set ccount.v = ccount.v + d.sub_deliverables | length %}{% endif %}{% endfor %}{{ dcount }} / {{ ccount.v }}{% else %}{{ results.deliverables | length }}{% endif %}</span>
+            </button>
+            {% endif %}
+            {% if 'evaluation_criteria' in sa %}
+            <button class="tab-btn" data-tab="evaluation">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Evaluation <span class="count">{{ results.get('evaluation_criteria', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'compliance' in sa %}
+            <button class="tab-btn" data-tab="compliance">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Compliance
+            </button>
+            {% endif %}
+            {% if 'risks' in sa %}
+            <button class="tab-btn" data-tab="risks">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Risks <span class="count">{{ results.get('risks', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'timeline' in sa %}
+            <button class="tab-btn" data-tab="timeline">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Timeline <span class="count">{{ results.get('timeline', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'key_requirements' in sa %}
+            <button class="tab-btn" data-tab="requirements">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Key Req. <span class="count">{{ results.get('key_requirements', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if 'strategic_checklist' in sa %}
+            <button class="tab-btn" data-tab="strategic">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Checklist
+            </button>
+            {% endif %}
+            {% if 'go_nogo' in sa %}
+            <button class="tab-btn" data-tab="gonogo">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Go / No-Go <span class="count">{{ results.get('go_nogo', {}).get('score', 0) }}%</span>
+            </button>
+            {% endif %}
+            {% if results.get('requirements', []) | length > 0 %}
+            <button class="tab-btn" data-tab="extracted-req">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Requirements <span class="count">{{ results.get('requirements', []) | length }}</span>
+            </button>
+            {% endif %}
+            {% if record_id %}
+            <button class="tab-btn" data-tab="smartreuse">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Smart Reuse
+            </button>
+            {% endif %}
+        </div>
+        <div class="tabs-fade" id="tabsFade"></div>
+        <button class="tab-scroll-arrow" id="tabScrollArrow" aria-label="Scroll tabs">&gt;</button>
+        </div>
+        </div>
+
+        {% if 'deliverables' in sa %}
+        <div class="tab-content active" id="tab-deliverables">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Required Deliverables
+                </h3>
+                {% if results.deliverables %}
+                {% if results.deliverables[0] is mapping %}
+                {# New hierarchical format #}
+                <ul class="tree" id="list-deliverables">
+                    {% for group in results.deliverables %}
+                    {% set parent = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+                    {% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+                    {% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+                    {% set outer_idx = loop.index %}
+                    <li class="tree-parent" id="deliv-{{ outer_idx }}" data-search="{{ parent | lower }} {{ children | join(' ') | lower }} {{ ref | lower }}">
+                        <div class="tree-parent-label" onclick="toggleDeliverable(this)">
+                            <svg class="toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="parent-accent"></span>
+                            <span class="label-text">{{ outer_idx }}. {{ parent }}</span>
+                        </div>
+                        {% if ref %}
+                        {% set pg_raw = group.page_number if group.page_number is defined else group.get('page_number', '') %}
+                        {% set rest = ref.split(']') | last %}
+                        {% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+                        {% set parsed_page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+                        {% set page_display = ('p.' + pg_raw|string) if pg_raw else parsed_page %}
+                        {% set desc = rest.split('—') | last if '—' in rest else '' %}
+                        <div class="tree-ref" title="{{ ref }}">
+                            <span class="ref-file">{{ ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ sec | trim }}</span>
+                            {% if page_display %}<span class="ref-page">{{ page_display }}</span>{% endif %}
+                            {% if desc %}<span class="ref-desc">— {{ desc | trim }}</span>{% endif %}
+                        </div>
+        {% endif %}
+
+                        <div class="m4sug-panel" id="m4sug-deliv-{{ outer_idx }}"></div>
+
+                        {% if children %}
+                        <ul class="tree-children">
+                    {% for child in children %}
+                    {% if child is mapping %}
+                    {% set child_name = child.name if child.name is defined else child.get('name', '') %}
+                    {% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+                    {% else %}
+                    {% set child_name = child %}
+                    {% set child_ref = '' %}
+                    {% endif %}
+                    <li class="tree-child" data-search="{{ outer_idx }}.{{ loop.index }} {{ parent | lower }} {{ child_name | lower }} {{ child_ref | lower }}">{{ outer_idx }}.{{ loop.index }} {{ child_name }}</li>
+                    {% if child_ref %}
+                    {% set cpg_raw = child.page_number if child.page_number is defined else child.get('page_number', '') %}
+                    {% set crest = child_ref.split(']') | last %}
+                    {% set csec = crest.split('p.')[0] if 'p.' in crest else crest.split('—')[0] %}
+                    {% set cparsed_page = 'p.' + crest.split('p.')[1].split('—')[0] | trim if 'p.' in crest else '' %}
+                    {% set cpage_display = ('p.' + cpg_raw|string) if cpg_raw else cparsed_page %}
+                    {% set cdesc = crest.split('—') | last if '—' in crest else '' %}
+                    <li class="tree-child-ref" title="{{ child_ref }}">
+                        <span class="ref-file">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+                        <span class="ref-sec">{{ csec | trim }}</span>
+                        {% if cpage_display %}<span class="ref-page">{{ cpage_display }}</span>{% endif %}
+                        {% if cdesc %}<span class="ref-desc">— {{ cdesc | trim }}</span>{% endif %}
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                {# Old flat format — backward compatibility #}
+                <ul class="list" id="list-deliverables">
+                    {% for item in results.deliverables %}
+                    <li data-search="{{ item | lower }}">{{ loop.index }}. {{ item }}<div class="m4sug-panel" id="m4sug-deliv-{{ loop.index0 }}"></div></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% else %}
+                <div class="empty-state">No deliverables extracted from this document.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'evaluation_criteria' in sa %}
+        <div class="tab-content" id="tab-evaluation">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Evaluation Criteria
+                </h3>
+                {% if results.evaluation_criteria %}
+                <ul class="list" id="list-evaluation">
+                    {% for item in results.evaluation_criteria %}
+                    <li data-search="{{ item | lower }}">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">No evaluation criteria found.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'compliance' in sa %}
+        <div class="tab-content" id="tab-compliance">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Departmental Compliance Checklist
+                </h3>
+                <div class="compliance-grid">
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Financial
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Financial', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Legal
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Legal', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Operations
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Operations', '') }}</div>
+                    </div>
+                    <div class="compliance-card">
+                        <div class="cc-title">
+                            <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Technical
+                        </div>
+                        <div class="cc-body">{{ results.get('compliance', {}).get('Technical', '') }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-card" style="margin-top:16px;border-left:3px solid var(--amber)">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Compliance Shred / Section L-M Crosswalk
+                </h3>
+                <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px">Maps every shall/must/will clause in the RFP's Instructions (Section L) and Evaluation (Section M) sections to the proposal-draft section that answers it.</p>
+                <div class="req-export-bar">
+                    <button class="btn btn-primary" id="m5Btn" onclick="runModule5Crosswalk()" title="Isolate Section L/M clauses and map them to proposal draft sections">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Run Crosswalk
+                    </button>
+                    <span id="m5Status" style="font-size:13px;color:var(--text-muted);margin-left:12px"></span>
+                </div>
+                {% set m5 = results.get('module5_crosswalk', {}) %}
+                {% if m5.get('clauses') %}
+                {% set m5mapped = namespace(v=0) %}{% set m5total = m5.get('clauses', []) | length %}{% for c in m5.get('clauses', []) %}{% if c.get('status') == 'Mapped' %}{% set m5mapped.v = m5mapped.v + 1 %}{% endif %}{% endfor %}
+                <div style="display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 14px;font-size:13px;color:var(--text-secondary)">
+                    <span><strong style="color:var(--text)">{{ m5total }}</strong> clauses</span>
+                    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:4px"></span><strong style="color:var(--green)">{{ m5mapped.v }} mapped</strong></span>
+                    <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:4px"></span><strong style="color:var(--red)">{{ m5total - m5mapped.v }} unmapped</strong></span>
+                    <span style="margin-left:auto">threshold: {{ m5.get('threshold', '') }}</span>
+                </div>
+                {% if m5.get('source_sections') %}
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
+                    {% if m5['source_sections'].get('L') %}<div>L analog: <strong>{{ m5['source_sections']['L'] }}</strong></div>{% endif %}
+                    {% if m5['source_sections'].get('M') %}<div>M analog: <strong>{{ m5['source_sections']['M'] }}</strong></div>{% endif %}
+                </div>
+                {% endif %}
+                <div class="req-table-wrap">
+                    <table class="req-table" id="m5Table">
+                        <thead>
+                            <tr>
+                                <th>Clause ID</th>
+                                <th>RFP Section</th>
+                                <th>Clause Text</th>
+                                <th>Page</th>
+                                <th>Answered In</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in m5.get('clauses', []) %}
+                            <tr data-search="{{ c.get('clause_id', '') | lower }} {{ c.get('text', '') | lower }} {{ c.get('draft_section', '') | lower }}">
+                                <td class="req-id">{{ c.get('clause_id', '') }}</td>
+                                <td class="req-section">{{ c.get('rfp_section_ref', '') }}</td>
+                                <td class="req-desc">{{ c.get('text', '') }}</td>
+                                <td class="req-page">{{ c.get('page_num', '') or '—' }}</td>
+                                <td>
+                                    {% if c.get('status') == 'Mapped' %}
+                                    <span class="sc-badge go">{{ c.get('draft_section', '') }}</span>
+                                    {% else %}
+                                    <span class="sc-badge no-go" title="Clause has no matching proposal-draft section">Unmapped — gap</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ '%.3f' | format(c.get('similarity_score', 0)) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% elif m5.get('note') %}
+                <div class="empty-state">{{ m5.get('note', '') }}</div>
+                {% else %}
+                <div class="empty-state">Run the crosswalk to map Section L/M clauses to proposal-draft sections.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'risks' in sa %}
+        <div class="tab-content" id="tab-risks">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Risk Assessment
+                </h3>
+                {% if results.risks %}
+                <div id="list-risks">
+                    {% for risk in results.risks %}
+                    <div class="risk-card severity-{{ risk.severity|string|lower }}" data-search="{{ risk.category|string|lower }} {{ risk.description|string|lower }}">
+                        <div style="flex:1">
+                            <div class="risk-top">
+                                <span class="risk-severity">{{ risk.severity }}</span>
+                                <span class="risk-category">{{ risk.category }}</span>
+                            </div>
+                            <div class="risk-desc">{{ risk.description }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No risks identified.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'timeline' in sa %}
+        <div class="tab-content" id="tab-timeline">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Timeline and Milestones
+                </h3>
+                {% if results.timeline %}
+                <div id="list-timeline">
+                    {% for t in results.timeline %}
+                    <div class="timeline-item" data-search="{{ t.milestone | lower }} {{ t.date_reference | lower }}">
+                        <div class="tl-dot"></div>
+                        <div>
+                            <div class="tl-milestone">{{ t.milestone }}</div>
+                            <div class="tl-date">{{ t.date_reference }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No timeline information found.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'key_requirements' in sa %}
+        <div class="tab-content" id="tab-requirements">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Key Requirements
+                </h3>
+                {% if results.key_requirements %}
+                <div id="list-requirements">
+                    {% for req in results.key_requirements %}
+                    <div class="key-req-item" data-search="{{ req | lower }}">
+                        <div class="kr-num">{{ loop.index }}</div>
+                        <div class="kr-text">{{ req }}</div>
+                        <div class="m4sug-panel" id="m4sug-kr-{{ loop.index0 }}"></div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">No key requirements extracted.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'go_nogo' in sa %}
+        <div class="tab-content" id="tab-gonogo">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Go / No-Go Recommendation
+                </h3>
+                {% set gn = results.get('go_nogo', {}) %}
+                {% set score = gn.score if gn.score is defined else 0 %}
+                {% set verdict = gn.verdict if gn.verdict is defined else '' %}
+                {% set vlow = (verdict|string|lower) if verdict else '' %}
+                {% set gauge_color = 'var(--green)' if vlow == 'go' else ('var(--amber)' if vlow == 'caution' else 'var(--red)') %}
+                {% set circumference = 2 * 3.14159 * 54 %}
+                {% set offset = circumference - (score / 100 * circumference) %}
+                <div class="go-score-wrap">
+                    <div class="go-gauge">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="track" cx="70" cy="70" r="54"/>
+                            <circle class="arc" cx="70" cy="70" r="54"
+                                stroke="{{ gauge_color }}"
+                                stroke-dasharray="{{ circumference }}"
+                                stroke-dashoffset="{{ offset }}"/>
+                        </svg>
+                        <div class="go-gauge-label">
+                            <span class="pct" style="color:{{ gauge_color }}">{{ score }}</span>
+                            <span class="pct-label">out of 100</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="go-verdict {{ vlow }}">{{ verdict }}</span>
+                        <div class="go-summary">{{ gn.summary if gn.summary is defined else '' }}</div>
+                    </div>
+                </div>
+                <div class="go-reasons">
+                    {% if gn.reasons is defined and gn.reasons %}
+                    {% for r in gn.reasons %}
+                    {% set wlow = (r.weight if r.weight is defined else '')|string|lower %}
+                    <div class="go-reason" data-search="{{ (r.factor if r.factor is defined else '') | lower }} {{ (r.detail if r.detail is defined else '') | lower }} {{ wlow }}">
+                        <div class="gr-icon">
+                            <svg class="icon" viewBox="0 0 24 24" style="color:{{ 'var(--green)' if wlow != 'high' else 'var(--red)' }}">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="gr-body">
+                            <div class="gr-factor">
+                                {{ r.factor if r.factor is defined else '' }}
+                                <span class="gr-weight {{ wlow }}">{{ r.weight if r.weight is defined else '' }}</span>
+                            </div>
+                            <div class="gr-detail">{{ r.detail if r.detail is defined else '' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">No go/no-go analysis available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'strategic_checklist' in sa %}
+        <div class="tab-content" id="tab-strategic">
+        {% set sc = results.strategic_checklist if results.strategic_checklist is defined else None %}
+        {% if sc %}
+        {# count statuses across all 4 sections #}
+        {% set all_items = (sc.get('financial', []) if sc is defined else []) + (sc.get('legal', []) if sc is defined else []) + (sc.get('operations', []) if sc is defined else []) + (sc.get('technical', []) if sc is defined else []) %}
+        {% set counts = {'Go': 0, 'No-Go': 0, 'Review': 0, 'Escalate': 0, 'Caution': 0, 'Not Specified in RFP': 0} %}
+        {% for item in all_items %}
+        {% set st = item.status if item.status is defined else '' %}
+        {% if st == 'Go' %}{% set _ = counts.update({'Go': counts['Go'] + 1}) %}
+        {% elif st == 'No-Go' %}{% set _ = counts.update({'No-Go': counts['No-Go'] + 1}) %}
+        {% elif st == 'Review' %}{% set _ = counts.update({'Review': counts['Review'] + 1}) %}
+        {% elif st == 'Escalate' %}{% set _ = counts.update({'Escalate': counts['Escalate'] + 1}) %}
+        {% elif st == 'Caution' %}{% set _ = counts.update({'Caution': counts['Caution'] + 1}) %}
+        {% elif st == 'Not Specified in RFP' %}{% set _ = counts.update({'Not Specified in RFP': counts['Not Specified in RFP'] + 1}) %}
+        {% endif %}
+        {% endfor %}
+        <div class="section-card" style="border-left:3px solid var(--primary)">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Executive Summary
+            </h3>
+            <p class="sc-exec">{{ sc.executive_summary if sc.executive_summary is defined else 'No executive summary available.' }}</p>
+        </div>
+        <div class="section-card sc-summary">
+            <div class="sc-summary-grid">
+                <div class="sc-summary-item go"><span class="sc-summary-count">{{ counts['Go'] }}</span><span class="sc-summary-label">Go</span></div>
+                <div class="sc-summary-item no-go"><span class="sc-summary-count">{{ counts['No-Go'] }}</span><span class="sc-summary-label">No-Go</span></div>
+                <div class="sc-summary-item review"><span class="sc-summary-count">{{ counts['Review'] }}</span><span class="sc-summary-label">Review</span></div>
+                <div class="sc-summary-item escalate"><span class="sc-summary-count">{{ counts['Escalate'] }}</span><span class="sc-summary-label">Escalate</span></div>
+                <div class="sc-summary-item caution"><span class="sc-summary-count">{{ counts['Caution'] }}</span><span class="sc-summary-label">Caution</span></div>
+                <div class="sc-summary-item not-specified"><span class="sc-summary-count">{{ counts['Not Specified in RFP'] }}</span><span class="sc-summary-label">Not Specified</span></div>
+            </div>
+        </div>
+
+        {% set sections = {'financial': 'FINANCIAL / ACCOUNTING CHECKLIST', 'legal': 'LEGAL CHECKLIST', 'operations': 'OPERATIONS CHECKLIST', 'technical': 'TECHNICAL CHECKLIST'} %}
+        {% for key, label in sections.items() %}
+        {% set items = sc[key] if sc[key] is defined else [] %}
+        <div class="section-card sc-section">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24">
+                {% if key == 'financial' %}
+                <path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% elif key == 'legal' %}
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% elif key == 'operations' %}
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% else %}
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                {% endif %}
+                </svg>
+                {{ label }}
+            </h3>
+            {% if items %}
+            <div class="sc-items">
+                {% for item in items %}
+                {% set status = (item.status if item.status is defined else '')|string|lower %}
+                <div class="sc-item" data-search="{{ (item.item if item.item is defined else '') | lower }} {{ status }} {{ (item.reasoning if item.reasoning is defined else '') | lower }}">
+                    <div class="sc-item-header">
+                        <span class="sc-item-name">{{ item.item if item.item is defined else '' }}</span>
+                        {% if status %}
+                        <span class="sc-badge {{ status | replace(' ', '-') }}">{{ item.status }}</span>
+                {% endif %}
+                <a href="/company_profile" class="btn" style="text-decoration:none">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Company Profile
+                </a>
+            </div>
+                    <div class="sc-item-reason">{{ item.reasoning if item.reasoning is defined else '' }}</div>
+
+                    {% set evid = item.rfp_evidence if item.rfp_evidence is defined else '' %}
+                    {% if evid %}
+                    <div class="sc-detail sc-evidence">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            RFP Evidence
+                        </div>
+                        <div class="sc-detail-text">{{ evid }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set m5sec = item.module5_draft_section if item.module5_draft_section is defined else '' %}
+                    {% set m5st = item.module5_status if item.module5_status is defined else '' %}
+                    {% if m5st %}
+                    <div class="sc-detail sc-evidence" style="border-left:3px solid var(--amber);margin-left:2px">
+                        <div class="sc-detail-label" style="color:var(--amber)">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Answered In
+                            {% if m5st == 'Mapped' and m5sec %}<span class="sc-badge go" style="margin-left:6px">{{ m5sec }}</span>
+                            {% elif m5st == 'Mapped' %}<span class="sc-badge go" style="margin-left:6px">{{ m5sec }}</span>
+                            {% else %}<span class="sc-badge no-go" style="margin-left:6px" title="No matching proposal-draft section">Unmapped — gap</span>{% endif %}
+                        </div>
+                        {% if item.module5_similarity is defined %}<div class="sc-detail-text" style="color:var(--text-muted);font-size:12px">similarity: {{ '%.3f' | format(item.module5_similarity) }}</div>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% set cevid = item.company_evidence if item.company_evidence is defined else '' %}
+                    {% if cevid %}
+                    <div class="sc-detail" style="border-left:3px solid var(--green);margin-left:2px">
+                        <div class="sc-detail-label" style="color:var(--green)">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Company Evidence
+                            <span class="cite-link" onclick="showCompanyCitation(this)" data-citation="{{ cevid|e }}" style="font-size:11px;font-weight:400;margin-left:6px;text-decoration:underline;text-decoration-style:dotted;cursor:pointer">view source</span>
+                        </div>
+                        <div class="sc-detail-text">{{ cevid }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set rfp_says = item.what_rfp_says if item.what_rfp_says is defined else '' %}
+                    {% if rfp_says %}
+                    <div class="sc-detail sc-rfp-says">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            What RFP Says
+                        </div>
+                        <div class="sc-detail-text">{{ rfp_says }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set risk = item.risk_level if item.risk_level is defined else '' %}
+                    {% if risk %}
+                    <div class="sc-detail sc-risk">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Risk Level: <span class="risk-tag {{ risk | lower }}">{{ risk }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% set impact = item.impact_on_bid_strategy if item.impact_on_bid_strategy is defined else '' %}
+                    {% if impact %}
+                    <div class="sc-detail sc-impact">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Impact on Bid Strategy
+                        </div>
+                        <div class="sc-detail-text">{{ impact }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set mitigation = item.mitigation_strategy if item.mitigation_strategy is defined else '' %}
+                    {% if mitigation %}
+                    <div class="sc-detail sc-mitigation">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Mitigation Strategy
+                        </div>
+                        <div class="sc-detail-text">{{ mitigation }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set analysis = item.analysis if item.analysis is defined else '' %}
+                    {% if analysis %}
+                    <div class="sc-detail sc-analysis">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Deep Analysis
+                        </div>
+                        <div class="sc-detail-text">{{ analysis }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% set rec = item.recommendation if item.recommendation is defined else '' %}
+                    {% if rec %}
+                    <div class="sc-detail sc-rec">
+                        <div class="sc-detail-label">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Recommendation
+                        </div>
+                        <div class="sc-detail-text">{{ rec }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">No items evaluated in this section.</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">Strategic checklist not available for this analysis.</div>
+        {% endif %}
+        </div>
+        {% endif %}
+
+        {% if results.get('requirements', []) | length > 0 %}
+        <div class="tab-content" id="tab-extracted-req">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Extracted Requirements
+                    <span style="font-size:12px;font-weight:400;color:var(--text-muted);margin-left:8px">{{ results.get('requirements', []) | length }} total</span>
+                </h3>
+                <div class="req-export-bar">
+                    <input type="text" class="req-filter" placeholder="Filter requirements..." oninput="filterRequirements(this.value)" style="flex:1;max-width:280px">
+                    <button class="btn" onclick="exportRequirementsExcel()" title="Download as Excel">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                        Export Excel
+                    </button>
+                    <button class="btn btn-primary" id="verifyReqBtn" onclick="verifyRequirements()" title="Verify requirements against company profile">
+                        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Verify
+                    </button>
+                </div>
+                <div class="req-table-wrap">
+                    <table class="req-table" id="requirementsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Section Ref</th>
+                                <th>Page</th>
+                                <th>Status</th>
+                                <th class="ver-col">Verified</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in results.get('requirements', []) %}
+                            {% set vdata = results.get('module2_verification', {}).get(req.get('req_id', ''), {}) %}
+                            <tr data-req-id="{{ req.get('req_id', '') }}" data-search="{{ req.get('req_id', '') | lower }} {{ req.get('category', '') | lower }} {{ req.get('description', '') | lower }} {{ req.get('section_ref', '') | lower }}">
+                                <td class="req-id">{{ req.get('req_id', '') }}</td>
+                                <td>
+                                    <select class="req-category-edit" data-req-id="{{ req.get('req_id', '') }}" onchange="updateRequirement(this)">
+                                        <option value="Financial" {% if req.get('category') == 'Financial' %}selected{% endif %}>Financial</option>
+                                        <option value="Legal" {% if req.get('category') == 'Legal' %}selected{% endif %}>Legal</option>
+                                        <option value="Technical" {% if req.get('category') == 'Technical' %}selected{% endif %}>Technical</option>
+                                        <option value="Operations" {% if req.get('category') == 'Operations' %}selected{% endif %}>Operations</option>
+                                        <option value="General" {% if req.get('category') == 'General' %}selected{% endif %}>General</option>
+                                    </select>
+                                </td>
+                                <td class="req-desc">{{ req.get('description', '') }}</td>
+                                <td class="req-section">{{ req.get('section_ref', '') }}</td>
+                                <td class="req-page">{{ req.get('page_num', '') or '—' }}</td>
+                                <td>
+                                    <select class="req-status-edit" data-req-id="{{ req.get('req_id', '') }}" onchange="updateRequirement(this)">
+                                        <option value="Yes" {% if req.get('initial_status') == 'Yes' %}selected{% endif %}>Yes</option>
+                                        <option value="No" {% if req.get('initial_status') == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Partial" {% if req.get('initial_status') == 'Partial' %}selected{% endif %}>Partial</option>
+                                    </select>
+                                </td>
+                                <td class="ver-col">
+                                    {% if vdata and vdata.get('status') %}
+                                    {% set vs = vdata.get('status', '')|string|lower %}
+                                    <span class="verify-status {{ vs|replace(' ', '-') }}" onclick="toggleVerifyDetail('{{ req.get('req_id', '') }}')" style="cursor:pointer">{{ vdata.get('status', '') }}</span>
+                                    <div class="verify-detail" id="vdetail-{{ req.get('req_id', '') }}">
+                                        <dl>
+                                            <dt>Reasoning</dt><dd>{{ vdata.get('reasoning', '') }}</dd>
+                                            <dt>RFP Evidence</dt><dd>{{ vdata.get('rfp_evidence', '') }}</dd>
+                                            <dt>Company Evidence</dt><dd>{% if vdata.get('company_evidence') %}<span class="cite-link" onclick="event.stopPropagation();showCompanyCitation(this)" data-citation="{{ vdata.get('company_evidence', '')|e }}">{{ vdata.get('company_evidence', '') }}</span>{% else %}—{% endif %}</dd>
+                                            <dt>Risk Level</dt><dd>{{ vdata.get('risk_level', '') }}</dd>
+                                            <dt>Mitigation</dt><dd>{{ vdata.get('mitigation_strategy', '') }}</dd>
+                                            <dt>Bid Impact</dt><dd>{{ vdata.get('impact_on_bid_strategy', '') }}</dd>
+                                        </dl>
+                                    </div>
+                                    {% else %}
+                                    <span style="color:var(--text-muted);font-size:12px">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if record_id %}
+        <div class="tab-content" id="tab-smartreuse">
+            <div class="section-card">
+                <h3>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Smart Content Reuse
+                    <a href="/module4/{{ record_id }}" style="margin-left:auto;font-size:13px;text-decoration:none;color:var(--primary)">Open full page &rarr;</a>
+                </h3>
+                <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Extract reusable Q&amp;A pairs from the RFP and adapt draft text to a professional proposal tone. Uses a separate Groq account, isolated from the Sentinel Copilot.</p>
+                <div class="module4-grid">
+                    <div class="module4-panel">
+                        <h4>Q&amp;A Extraction</h4>
+                        <textarea class="m4-draft" id="m4qaInput" placeholder="Paste text containing question-answer pairs (e.g. pre-bid Q&amp;A addendum)..."></textarea>
+                        <div class="m4-row">
+                            <button class="btn" id="m4qaBtn" onclick="runModule4QA()">
+                                <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none"/><path d="M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                                Extract Q&amp;A
+                            </button>
+                            <button class="btn" id="m4loadBtn" onclick="m4LoadRfpText()" style="background:var(--surface);color:var(--primary);border:1px solid var(--primary)">Load RFP Text</button>
+                        </div>
+                        <div class="m4-status" id="m4qaStatus"></div>
+                        <div id="m4qaResults"></div>
+                    </div>
+                    <div class="module4-panel">
+                        <h4>Tone Adaptation</h4>
+                        <textarea class="m4-draft" id="m4draft">{{ results.get('summary', '') }}</textarea>
+                        <div class="m4-row">
+                            <button class="btn" id="m4toneBtn" onclick="runModule4Tone()">Adapt Tone</button>
+                        </div>
+                        <div class="m4-status" id="m4toneStatus"></div>
+                        <div id="m4toneResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    <div class="toast" id="toast">
+        <svg class="icon toast-icon" style="color:var(--green)" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="toast-msg"></span>
+    </div>
+
+    <div class="modal-overlay" id="citationModal" onclick="if(event.target===this)closeCitationModal()">
+        <div class="modal-box" style="position:relative">
+            <button class="modal-close" onclick="closeCitationModal()">&times;</button>
+            <h4>Company Evidence</h4>
+            <p id="citationBody"></p>
+        </div>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            if (theme === 'dark') {
+                var icon = document.getElementById('themeIcon');
+                if (icon) {
+                    icon.outerHTML = '<svg class="icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                }
+            }
+
+            var dropdown = document.getElementById('exportDropdown');
+            var exportBtn = document.getElementById('exportBtn');
+            if (dropdown && exportBtn) {
+                exportBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var open = dropdown.classList.toggle('open');
+                    exportBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.remove('open');
+                        exportBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        dropdown.classList.remove('open');
+                        exportBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            var tabs = document.querySelectorAll('.tab-btn');
+            var contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(function(t) { t.classList.remove('active'); });
+                    contents.forEach(function(c) { c.classList.remove('active'); });
+                    tab.classList.add('active');
+                    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+            // Auto-select first tab if none active
+            var activeTab = document.querySelector('.tab-btn.active');
+            if (!activeTab && tabs.length > 0) {
+                tabs[0].classList.add('active');
+                var firstContent = document.getElementById('tab-' + tabs[0].dataset.tab);
+                if (firstContent) firstContent.classList.add('active');
+            }
+
+            // ===== HYBRID TAB BAR =====
+            (function() {
+                var container = document.getElementById('tabContainer');
+                var fade = document.getElementById('tabsFade');
+                var arrow = document.getElementById('tabScrollArrow');
+                if (!container || !fade || !arrow) return;
+                var isTouch = window.matchMedia('(pointer: coarse)').matches;
+                function updateFade() {
+                    var atEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 2;
+                    fade.classList.toggle('show', !atEnd && !isTouch);
+                    arrow.classList.toggle('visible', !atEnd && !isTouch);
+                }
+                container.addEventListener('scroll', updateFade);
+                window.addEventListener('resize', updateFade);
+                setTimeout(updateFade, 200);
+                arrow.addEventListener('click', function() {
+                    var amount = container.clientWidth * 0.7;
+                    var target = Math.min(container.scrollLeft + amount, container.scrollWidth - container.clientWidth);
+                    container.scrollTo({ left: target, behavior: 'smooth' });
+                });
+                container.addEventListener('touchstart', function() { arrow.classList.remove('visible'); fade.classList.remove('show'); });
+            })();
+
+            window.toggleDeliverable = function(label) {
+                var parent = label.closest('.tree-parent');
+                if (!parent) return;
+                parent.classList.toggle('collapsed');
+            };
+
+            window.filterResults = function(query) {
+                var q = query.toLowerCase().trim();
+                var anyVisible = false;
+
+                // Handle flat list items (old format + other sections like evaluation, risks)
+                document.querySelectorAll('.tab-content.active .list [data-search]').forEach(function(el) {
+                    el.style.display = (!q || el.dataset.search.includes(q)) ? '' : 'none';
+                    if (el.style.display !== 'none') anyVisible = true;
+                });
+
+                // Handle tree view items (new hierarchical deliverables)
+                document.querySelectorAll('.tab-content.active .tree-parent').forEach(function(parent) {
+                    if (!q) {
+                        parent.style.display = '';
+                        parent.querySelectorAll('.tree-child').forEach(function(c) { c.style.display = ''; });
+                        anyVisible = true;
+                        return;
+                    }
+                    var parentMatch = parent.dataset.search && parent.dataset.search.includes(q);
+                    var hasVisibleChild = false;
+                    parent.querySelectorAll('.tree-child').forEach(function(child) {
+                        if (child.dataset.search && child.dataset.search.includes(q)) {
+                            child.style.display = '';
+                            hasVisibleChild = true;
+                        } else {
+                            child.style.display = parentMatch ? '' : 'none';
+                        }
+                    });
+                    if (parentMatch || hasVisibleChild) {
+                        parent.style.display = '';
+                        parent.classList.remove('collapsed');
+                        anyVisible = true;
+                    } else {
+                        parent.style.display = 'none';
+                    }
+                });
+
+                document.querySelectorAll('.tab-content.active .section-card').forEach(function(card) {
+                    var visible = card.querySelectorAll('.list [data-search]:not([style*="display: none"]), .tree-parent:not([style*="display: none"])');
+                    var empty = card.querySelector('.empty-state');
+                    if (empty) empty.style.display = visible.length === 0 ? '' : 'none';
+                });
+            };
+
+            var toast = document.getElementById('toast');
+            function showToast(msg) {
+                toast.querySelector('.toast-msg').textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 18000);
+            }
+            document.addEventListener('DOMContentLoaded', function() { showToast('Analysis complete!'); });
+
+            window.updateRequirement = function(el) {
+                var reqId = el.dataset.reqId;
+                var row = el.closest('tr');
+                if (!row) return;
+                var category = row.querySelector('.req-category-edit').value;
+                var status = row.querySelector('.req-status-edit').value;
+                var desc = row.querySelector('.req-desc').textContent;
+                var sectionRef = row.querySelector('.req-section').textContent;
+                var pageCell = row.querySelector('.req-page').textContent;
+                var pageNum = pageCell === '—' ? null : parseInt(pageCell) || null;
+                var payload = {
+                    req_id: reqId, category: category, description: desc,
+                    section_ref: sectionRef, page_num: pageNum, initial_status: status
+                };
+                var stored = JSON.parse(document.getElementById('requirementsTable').dataset.requirements || '[]');
+                var idx = stored.findIndex(function(r) { return r.req_id === reqId; });
+                if (idx >= 0) stored[idx] = payload; else stored.push(payload);
+                document.getElementById('requirementsTable').dataset.requirements = JSON.stringify(stored);
+            };
+
+            window.filterRequirements = function(query) {
+                var q = query.toLowerCase().trim();
+                document.querySelectorAll('#requirementsTable tbody tr').forEach(function(row) {
+                    var search = row.dataset.search || '';
+                    row.style.display = (!q || search.includes(q)) ? '' : 'none';
+                });
+            };
+
+            window.extractRequirements = function() {
+                var btn = document.getElementById('extractReqBtn');
+                if (!btn) return;
+                btn.disabled = true;
+                btn.textContent = 'Extracting...';
+                fetch('/extract_requirements/{{ record_id }}', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.error) { btn.textContent = 'Error: ' + data.error; btn.disabled = false; return; }
+                        btn.textContent = data.count + ' requirements extracted';
+                        btn.disabled = false;
+                        var reqs = data.requirements || [];
+                        var categories = ['Financial', 'Legal', 'Technical', 'Operations', 'General'];
+                        var statuses = ['Yes', 'No', 'Partial'];
+                        var tbody = '';
+                        for (var i = 0; i < reqs.length; i++) {
+                            var r = reqs[i];
+                            var catOpts = '';
+                            for (var c = 0; c < categories.length; c++) {
+                                catOpts += '<option value="' + categories[c] + '"' + (r.category === categories[c] ? ' selected' : '') + '>' + categories[c] + '</option>';
+                            }
+                            var statOpts = '';
+                            for (var s = 0; s < statuses.length; s++) {
+                                statOpts += '<option value="' + statuses[s] + '"' + (r.initial_status === statuses[s] ? ' selected' : '') + '>' + statuses[s] + '</option>';
+                            }
+                            var searchStr = ((r.req_id || '') + ' ' + (r.category || '') + ' ' + (r.description || '') + ' ' + (r.section_ref || '')).toLowerCase();
+                            tbody += '<tr data-req-id="' + (r.req_id || '') + '" data-search="' + searchStr + '">'
+                                + '<td class="req-id">' + (r.req_id || '') + '</td>'
+                                + '<td><select class="req-category-edit" data-req-id="' + (r.req_id || '') + '" onchange="updateRequirement(this)">' + catOpts + '</select></td>'
+                                + '<td class="req-desc">' + (r.description || '') + '</td>'
+                                + '<td class="req-section">' + (r.section_ref || '') + '</td>'
+                                + '<td class="req-page">' + (r.page_num || '—') + '</td>'
+                                + '<td><select class="req-status-edit" data-req-id="' + (r.req_id || '') + '" onchange="updateRequirement(this)">' + statOpts + '</select></td>'
+                                + '<td class="ver-col"><span style="color:var(--text-muted);font-size:12px">—</span></td>'
+                                + '</tr>';
+                        }
+                        var table = document.getElementById('requirementsTable');
+                        if (table) {
+                            var tbodyEl = table.querySelector('tbody');
+                            if (tbodyEl) tbodyEl.innerHTML = tbody;
+                            table.dataset.requirements = JSON.stringify(reqs);
+                        }
+                        var countEl = btn.closest('.section-card') ? btn.closest('.section-card').querySelector('h3 span') : null;
+                        if (countEl) countEl.textContent = reqs.length + ' total';
+                    })
+                    .catch(function(err) {
+                        btn.textContent = 'Failed: ' + err.message;
+                        btn.disabled = false;
+                    });
+            };
+
+            window.exportRequirementsExcel = function() {
+                var rows = [];
+                document.querySelectorAll('#requirementsTable tbody tr').forEach(function(row) {
+                    rows.push({
+                        req_id: row.dataset.reqId || '',
+                        category: row.querySelector('.req-category-edit').value,
+                        description: row.querySelector('.req-desc').textContent.trim(),
+                        section_ref: row.querySelector('.req-section').textContent.trim(),
+                        page_num: row.querySelector('.req-page').textContent.trim(),
+                        initial_status: row.querySelector('.req-status-edit').value
+                    });
+                });
+                var blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url; a.download = 'requirements_export.json'; a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            /* ── Module 2: Verify Requirements ── */
+            window.verifyRequirements = function() {
+                var btn = document.getElementById('verifyReqBtn');
+                if (!btn) return;
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none"/></svg> Verifying...';
+                fetch('/verify_requirements/{{ record_id }}', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.error) { btn.innerHTML = 'Error: ' + data.error; btn.disabled = false; return; }
+                        btn.innerHTML = 'Done! ' + data.requirement_count + ' verified';
+                        setTimeout(function() { location.reload(); }, 800);
+                    })
+                    .catch(function(err) {
+                        btn.innerHTML = 'Failed: ' + err.message;
+                        btn.disabled = false;
+                    });
+            };
+
+            /* ── Run Compliance Shred / Section L-M Crosswalk ── */
+            window.runModule5Crosswalk = function() {
+                var btn = document.getElementById('m5Btn');
+                var status = document.getElementById('m5Status');
+                if (!btn) return;
+                btn.disabled = true;
+                btn.innerHTML = 'Running crosswalk...';
+                if (status) status.textContent = '';
+                fetch('/module5/crosswalk/{{ record_id }}', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.error) { btn.innerHTML = 'Error: ' + data.error; btn.disabled = false; return; }
+                        btn.innerHTML = 'Run Crosswalk';
+                        btn.disabled = false;
+                        if (status) status.textContent = data.clause_count + ' clauses — ' + data.mapped + ' mapped / ' + data.unmapped + ' unmapped';
+                        setTimeout(function() { location.reload(); }, 900);
+                    })
+                    .catch(function(err) {
+                        btn.innerHTML = 'Failed: ' + err.message;
+                        btn.disabled = false;
+                    });
+            };
+
+            /* ── Module 2: Toggle verification detail in requirements table ── */
+            window.toggleVerifyDetail = function(reqId) {
+                var el = document.getElementById('vdetail-' + reqId);
+                if (el) el.classList.toggle('open');
+            };
+
+            /* ── Module 2: Company evidence citation modal ── */
+            window.showCompanyCitation = function(el) {
+                var text = el.dataset.citation || el.getAttribute('data-citation') || '';
+                var modal = document.getElementById('citationModal');
+                var body = document.getElementById('citationBody');
+                if (modal && body) {
+                    body.textContent = text;
+                    modal.classList.add('open');
+                }
+            };
+            window.closeCitationModal = function() {
+                var modal = document.getElementById('citationModal');
+                if (modal) modal.classList.remove('open');
+            };
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') window.closeCitationModal();
+            });
+
+            /* ── Smart Content Reuse (results tab) ── */
+            var m4SourceText = null;
+
+            function m4EscapeHtml(s) {
+                if (!s) return '';
+                return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+
+            function m4SetStatus(el, html, busy) {
+                el.innerHTML = (busy ? '<span class="spinner"></span>' : '') + (html || '');
+            }
+
+            function m4LoadSource() {
+                if (m4SourceText) return Promise.resolve();
+                return fetch('/api/case/{{ record_id }}/module4/source')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.error) throw new Error(data.error);
+                        m4SourceText = data.text;
+                    });
+            }
+
+            window.m4LoadRfpText = function() {
+                var status = document.getElementById('m4qaStatus');
+                var btn = document.getElementById('m4loadBtn');
+                if (btn) btn.disabled = true;
+                m4SetStatus(status, 'Loading RFP text...', true);
+                m4LoadSource()
+                    .then(function() {
+                        document.getElementById('m4qaInput').value = m4SourceText;
+                        m4SetStatus(status, 'RFP text loaded (' + m4SourceText.length + ' chars)');
+                        if (btn) btn.disabled = false;
+                    })
+                    .catch(function(err) {
+                        m4SetStatus(status, 'Failed: ' + m4EscapeHtml(err.message));
+                        if (btn) btn.disabled = false;
+                    });
+            };
+
+            window.runModule4QA = function() {
+                var btn = document.getElementById('m4qaBtn');
+                var status = document.getElementById('m4qaStatus');
+                var results = document.getElementById('m4qaResults');
+                var text = document.getElementById('m4qaInput').value.trim();
+                if (!btn || btn.disabled) return;
+                if (!text) { m4SetStatus(status, 'Enter text first, or click "Load RFP Text".'); return; }
+                btn.disabled = true;
+                m4SetStatus(status, 'Extracting Q&amp;A pairs...', true);
+                results.innerHTML = '';
+                fetch('/api/module4/extract-qa', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: text})
+                })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        btn.disabled = false;
+                        if (data.error) { m4SetStatus(status, 'Error: ' + m4EscapeHtml(data.error)); return; }
+                        var pairs = data.qa_pairs || [];
+                        m4SetStatus(status, data.count + ' Q&amp;A pair' + (data.count === 1 ? '' : 's') + ' extracted');
+                        if (pairs.length === 0) { results.innerHTML = '<div class="m4-qa-item" style="color:var(--text-muted)">No Q&amp;A pairs found.</div>'; return; }
+                        var html = '';
+                        pairs.forEach(function(p) {
+                            html += '<div class="m4-qa-item"><div class="m4-qa-q">' + m4EscapeHtml(p.question || '') + '</div>' +
+                                    '<div class="m4-qa-a">' + m4EscapeHtml(p.answer || '') + '</div>' +
+                                    (p.context ? '<div class="m4-qa-c">Context: ' + m4EscapeHtml(p.context) + '</div>' : '') + '</div>';
+                        });
+                        results.innerHTML = html;
+                    })
+                    .catch(function(err) {
+                        btn.disabled = false;
+                        m4SetStatus(status, 'Failed: ' + m4EscapeHtml(err.message));
+                    });
+            };
+
+            window.runModule4Tone = function() {
+                var btn = document.getElementById('m4toneBtn');
+                var status = document.getElementById('m4toneStatus');
+                var results = document.getElementById('m4toneResults');
+                var draft = document.getElementById('m4draft').value.trim();
+                if (!btn || btn.disabled) return;
+                if (!draft) { m4SetStatus(status, 'Enter some draft text first.'); return; }
+                btn.disabled = true;
+                m4SetStatus(status, 'Adapting tone...', true);
+                results.innerHTML = '';
+                fetch('/api/module4/adapt-tone', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({draft: draft})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    btn.disabled = false;
+                    if (data.error) { m4SetStatus(status, 'Error: ' + m4EscapeHtml(data.error)); return; }
+                    m4SetStatus(status, 'Tone adapted');
+                    results.innerHTML =
+                        '<div class="m4-tone-box"><h5>Original</h5><p>' + m4EscapeHtml(data.original) + '</p></div>' +
+                        '<div class="m4-tone-box"><h5>Adapted</h5><p>' + m4EscapeHtml(data.adapted) + '</p></div>';
+                })
+                .catch(function(err) {
+                    btn.disabled = false;
+                    m4SetStatus(status, 'Failed: ' + m4EscapeHtml(err.message));
+                });
+            };
+
+        })();
+    </script>
+    <script>
+        (function() {
+            window.addEventListener('load', function() {
+                var loader = document.getElementById('pageLoader');
+                if (loader) loader.classList.add('hidden');
+            });
+            document.addEventListener('click', function(e) {
+                var a = e.target.closest('a');
+                if (!a) return;
+                var href = a.getAttribute('href');
+                if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+                var loader = document.getElementById('pageLoader');
+                if (loader) { loader.classList.remove('hidden'); }
+            });
+        })();
+    </script>
+    <script>
+        (function() {
+            var CASE_ID = {{ record_id | tojson }};
+            var REQS = {{ results.get('key_requirements', []) | tojson }};
+            var DELIV = {{ results.get('deliverables', []) | tojson }};
+            var DRAFTS = {{ results.get('module4_drafts', {}) | tojson }};
+
+            var M4_TEXT = {};
+            var M4_ANS = {};
+            var M4_SRC = {};
+
+            function m4Esc(s) {
+                if (!s) return '';
+                return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function m4Flash(key, msg) {
+                var el = document.getElementById('m4flash-' + key);
+                if (el) el.textContent = msg;
+            }
+
+            function delivList() {
+                if (!Array.isArray(DELIV)) return [];
+                return DELIV;
+            }
+
+            function isHierDeliv() {
+                return Array.isArray(DELIV) && DELIV.length && typeof DELIV[0] === 'object' && DELIV[0] !== null;
+            }
+
+            function delivText(idx) {
+                var list = delivList();
+                if (isHierDeliv()) {
+                    var g = list[idx - 1];
+                    return g ? (g.deliverable || g['deliverable'] || '') : '';
+                }
+                return list[idx] || '';
+            }
+
+            function renderDraft(panel, key, text) {
+                panel.innerHTML =
+                    '<div class="m4sug-draft-wrap">' +
+                        '<div class="m4sug-hint">In-progress answer for this requirement (edits are saved to this case).</div>' +
+                        '<textarea class="m4sug-draft" id="draft-ta-' + key + '">' + m4Esc(text) + '</textarea>' +
+                        '<div class="m4sug-row">' +
+                            '<button class="m4sug-btn" onclick="m4SaveDraft(\'' + key + '\')">Save draft</button>' +
+                            '<button class="m4sug-btn ghost" onclick="m4SaveToLibrary(\'' + key + '\')">Save to library</button>' +
+                            '<button class="m4sug-btn ghost" onclick="m4CopyDraft(\'' + key + '\')">Copy</button>' +
+                        '</div>' +
+                        '<div class="m4sug-hint" id="m4flash-' + key + '"></div>' +
+                    '</div>';
+            }
+
+            function renderSuggest(panel, key, data) {
+                var a = data.answer;
+                panel.innerHTML =
+                    '<div class="m4sug-card">' +
+                        '<div class="m4sug-head"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> Library suggestion <span class="m4sug-score">' + Math.round((data.score || 0) * 100) + '% match</span></div>' +
+                        '<div class="m4sug-src">From: ' + m4Esc(a.source_document || 'unknown') + '</div>' +
+                        '<div class="m4sug-q">' + m4Esc(a.question) + '</div>' +
+                        '<div class="m4sug-a">' + m4Esc(a.answer) + '</div>' +
+                        '<div class="m4sug-row">' +
+                            '<button class="m4sug-btn" onclick="m4Apply(\'' + key + '\')">Apply to this RFP</button>' +
+                        '</div>' +
+                    '</div>';
+            }
+
+            window.m4Apply = function(key) {
+                var panel = document.getElementById('m4sug-' + key.replace('_', '-'));
+                if (!panel) return;
+                var text = M4_TEXT[key] || '';
+                if (!M4_ANS[key]) return;
+                panel.innerHTML = '<div class="m4sug-none">Adapting tone for this case...</div>';
+                fetch('/api/module4/library/apply', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({case_id: CASE_ID, req_key: key, answer_id: M4_ANS[key], requirement: text})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.error) { panel.innerHTML = '<div class="m4sug-none">' + m4Esc(data.error) + '</div>'; return; }
+                    M4_SRC[key] = data.source_document || '';
+                    renderDraft(panel, key, data.adapted);
+                })
+                .catch(function(err) { panel.innerHTML = '<div class="m4sug-none">' + m4Esc(err.message) + '</div>'; });
+            };
+
+            window.m4SaveDraft = function(key) {
+                var ta = document.getElementById('draft-ta-' + key);
+                if (!ta) return;
+                fetch('/api/module4/library/draft', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({case_id: CASE_ID, req_key: key, text: ta.value})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { m4Flash(key, data.ok ? 'Draft saved' : (data.error || 'Save failed')); })
+                .catch(function() { m4Flash(key, 'Save failed'); });
+            };
+
+            window.m4SaveToLibrary = function(key) {
+                var ta = document.getElementById('draft-ta-' + key);
+                if (!ta) return;
+                var q = M4_TEXT[key] || '';
+                var a = ta.value;
+                if (!q || !a) return;
+                fetch('/api/module4/library/save-adapted', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: q, adapted: a, source_document: M4_SRC[key] || 'manual-entry'})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { m4Flash(key, data.ok ? 'Saved to library' : (data.error || 'Save failed')); })
+                .catch(function() { m4Flash(key, 'Save failed'); });
+            };
+
+            window.m4CopyDraft = function(key) {
+                var ta = document.getElementById('draft-ta-' + key);
+                if (!ta) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(ta.value).then(function() { m4Flash(key, 'Copied'); });
+                } else {
+                    ta.select();
+                    document.execCommand('copy');
+                    m4Flash(key, 'Copied');
+                }
+            };
+
+            function wirePanels() {
+                document.querySelectorAll('.m4sug-panel').forEach(function(panel) {
+                    var id = panel.id;
+                    if (!id || id.indexOf('m4sug-') !== 0) return;
+                    var key = id.replace('m4sug-', '').replace('-', '_');
+                    var text;
+                    if (id.indexOf('m4sug-kr-') === 0) {
+                        text = REQS[parseInt(id.split('-')[2], 10)] || '';
+                    } else {
+                        text = delivText(parseInt(id.split('-')[2], 10));
+                    }
+                    if (!text) return;
+                    M4_TEXT[key] = text;
+                    var draft = DRAFTS[key];
+                    if (draft && draft.text) { renderDraft(panel, key, draft.text); return; }
+                    fetch('/api/module4/library/suggest', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({requirement: text})
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.match || !data.answer) return;
+                        M4_ANS[key] = data.answer.answer_id;
+                        M4_SRC[key] = data.answer.source_document || '';
+                        renderSuggest(panel, key, data);
+                    })
+                    .catch(function() {});
+                });
+            }
+
+            wirePanels();
+        })();
+    </script>
+</body>
+</html>

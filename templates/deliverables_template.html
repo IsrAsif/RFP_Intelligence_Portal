@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@page {
+    size: A4;
+    margin: 20mm 10mm 18mm;
+
+}
+
+body{font-family:Helvetica,Arial,sans-serif;color:#222;font-size:10pt;line-height:1.4;margin:0;padding:0}
+h1{font-size:18pt;margin:0 0 2px 0;color:#111}
+.meta{color:#666;font-size:9pt;margin-bottom:14px;border-bottom:2px solid #4f46e5;padding-bottom:6px}
+h2{font-size:13pt;color:#4f46e5;margin:16px 0 8px 0;border-bottom:1px solid #ddd;padding-bottom:3px}
+table{width:100%;border-collapse:collapse;margin-bottom:10px}
+td{padding:4px 6px;font-size:9pt;vertical-align:top;border-bottom:1px solid #eee}
+.sb{background:#f0fdf4;border-left:3px solid #22c55e;padding:6px 10px;margin-bottom:10px;font-size:9pt;color:#333}
+.parent td{font-weight:700;background:#f8fafc;padding:6px 6px 3px;border-bottom:none;font-size:10pt;color:#111}
+.parent-ref td{padding:2px 6px 4px 16px;font-size:7pt;color:#444;font-family:Courier,monospace;border-bottom:none}
+.child td{padding:3px 6px 2px 24px;font-size:9pt;color:#444;border-bottom:none}
+.child-ref td{padding:2px 6px 5px 34px;font-size:7pt;color:#444;font-family:Courier,monospace;border-bottom:1px solid #eee}
+.flat td{padding:4px 6px;font-size:9pt;color:#444}
+.footer{text-align:center;font-size:7pt;color:#aaa;margin-top:20px;border-top:1px solid #eee;padding-top:6px}
+.note{color:#999;padding:8px;text-align:center;font-size:9pt}
+.page-break { page-break-before: always; }
+.toc-item { padding: 4px 0; font-size: 9pt; color: #333; }
+</style>
+</head><body>
+
+<div style="page: toc">
+<h1>Table of Contents</h1>
+{% if results.deliverables and results.deliverables[0] is mapping %}
+{% for group in results.deliverables %}
+{% set pname = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+{% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+<div class="toc-item">{{ loop.index }}. {{ pname }}</div>
+{% if children %}{% set outer_loop = loop %}{% for child in children %}{% set cname = child.name if child.name is defined else child %}<div class="toc-item" style="padding-left:12px;font-size:8pt;color:#666">{{ outer_loop.index }}.{{ loop.index }} {{ cname }}</div>{% endfor %}{% endif %}
+{% endfor %}
+{% endif %}
+</div>
+
+<div class="page-break">
+<h1>Deliverables Document</h1>
+<div class="meta">Source: {{ filename }} | Generated: {{ date }}</div>
+
+{% if results.summary is defined and results.summary %}
+<div class="sb"><b>RFP Summary:</b> {{ results.summary }}</div>
+{% endif %}
+
+<h2>Required Deliverables</h2>
+<table>
+{% if results.deliverables is defined and results.deliverables %}
+{% if results.deliverables[0] is mapping %}
+{% for group in results.deliverables %}
+{% set pname = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+{% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+{% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+{% set outer_idx = loop.index %}
+{% if outer_idx > 1 %}<tr><td style="padding:0;border:none"><div class="page-break"></div></td></tr>{% endif %}
+<tr class="parent"><td><b>{{ outer_idx }}. {{ pname }}</b></td></tr>
+{% if ref %}
+<tr class="parent-ref"><td>
+<span style="display:inline-block;background:#eef2ff;color:#4f46e5;font-weight:700;padding:1px 6px;border-radius:2px;font-size:7pt">{{ ref.split(']')[0] | replace('[','') }}</span>
+{% set rest = ref.split(']') | last %}
+{% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+{% set page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+{% set desc = rest.split('—') | last if '—' in rest else '' %}
+<span style="display:inline-block;background:#ecfdf5;color:#059669;font-weight:600;padding:1px 6px;border-radius:2px;font-size:7pt">{{ sec | trim }}</span>
+{% if page %}<span style="display:inline-block;background:#fffbeb;color:#d97706;font-weight:600;padding:1px 6px;border-radius:2px;font-size:7pt">{{ page }}</span>{% endif %}
+{% if desc %}<span style="color:#94a3b8;font-size:7pt;padding:1px 3px">— {{ desc | trim }}</span>{% endif %}
+</td></tr>
+{% endif %}
+{% if children %}
+{% for child in children %}
+{% if child is mapping %}
+{% set child_name = child.name if child.name is defined else child.get('name', '') %}
+{% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+{% else %}
+{% set child_name = child %}
+{% set child_ref = '' %}
+{% endif %}
+<tr class="child"><td>{{ outer_idx }}.{{ loop.index }} {{ child_name }}</td></tr>
+{% if child_ref %}
+<tr class="child-ref"><td>
+<span style="display:inline-block;background:#eef2ff;color:#4f46e5;font-weight:700;padding:1px 6px;border-radius:2px;font-size:7pt">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+{% set rest = child_ref.split(']') | last %}
+{% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+{% set page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+{% set desc = rest.split('—') | last if '—' in rest else '' %}
+<span style="display:inline-block;background:#ecfdf5;color:#059669;font-weight:600;padding:1px 6px;border-radius:2px;font-size:7pt">{{ sec | trim }}</span>
+{% if page %}<span style="display:inline-block;background:#fffbeb;color:#d97706;font-weight:600;padding:1px 6px;border-radius:2px;font-size:7pt">{{ page }}</span>{% endif %}
+{% if desc %}<span style="color:#94a3b8;font-size:7pt;padding:1px 3px">— {{ desc | trim }}</span>{% endif %}
+</td></tr>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% else %}
+{% for item in results.deliverables %}
+<tr class="flat"><td>{{ loop.index }}. {{ item }}</td></tr>
+{% endfor %}
+{% endif %}
+{% else %}
+<tr><td class="note">No deliverables extracted.</td></tr>
+{% endif %}
+</table>
+
+<div class="footer">RFP Automation Portal — Powered by Bilal (Team Lead), Isra Asif &amp; Maria Khan</div>
+</body></html>

@@ -7,3 +7,5 @@ xhtml2pdf
 python-dotenv
 groq
 PyMuPDF
+openpyxl
+requests

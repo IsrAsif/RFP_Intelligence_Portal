@@ -1,0 +1,37 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+instance/
+
+# Secrets
+.env
+.secret_key
+
+# Data
+uploads/
+exports/
+analyses.db
+
+# Debug files
+debug_dumps/
+app_error.txt
+app_output.txt
+_check_truncation.py
+_groq_test_final.py
+debug_api.py
+debug_full.py
+test_rfp.txt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+*.egg-info/
+dist/
+build/

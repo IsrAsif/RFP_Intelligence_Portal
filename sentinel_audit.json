@@ -1,0 +1,840 @@
+{
+  "34a52412": [
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-024 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:37.138234"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-025 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:37.189207"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No Be Accepted\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-026 \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No B",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.557). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:38.090944"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No Be Accepted\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-026 \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No B",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.557). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:38.292896"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No Be Accepted\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-026 \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No B",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.557). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:39.500897"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No Be Accepted\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-026 \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No B",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.557). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:39.569683"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No Be Accepted\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-026 \u2014 \"Due Date and Time: July 7, 2026 NLT 2:00 P.M. Local Time (Time Stamped 2:01 P.M. or Later Will No B",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.557). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:40.082389"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Failure to submit all information requested the Issuing agency may require prom",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Failure to submit all information requested the Issuing agency may require prompt submission of missing information...\" (XI.A.5)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-027 \u2014 \"Failure to submit all information requested the Issuing agency may require prompt submission of mis",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.551). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:41.233727"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Failure to submit all information requested the Issuing agency may require prom",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Failure to submit all information requested the Issuing agency may require prompt submission of missing information...\" (XI.A.5)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-027 \u2014 \"Failure to submit all information requested the Issuing agency may require prompt submission of mis",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.551). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:43.878677"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Failure to submit all information requested the Issuing agency may require prom",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Failure to submit all information requested the Issuing agency may require prompt submission of missing information...\" (XI.A.5)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-027 \u2014 \"Failure to submit all information requested the Issuing agency may require prompt submission of mis",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.551). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:43.971623"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Failure to submit all information requested the Issuing agency may require prom",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Failure to submit all information requested the Issuing agency may require prompt submission of missing information...\" (XI.A.5)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-027 \u2014 \"Failure to submit all information requested the Issuing agency may require prompt submission of mis",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.551). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:44.154518"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Failure to submit all information requested the Issuing agency may require prom",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Failure to submit all information requested the Issuing agency may require prompt submission of missing information...\" (XI.A.5)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-027 \u2014 \"Failure to submit all information requested the Issuing agency may require prompt submission of mis",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.551). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:44.226477"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Nam",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-028 \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.581). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:44.317425"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Nam",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-028 \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.581). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:44.693209"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Nam",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover page)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-028 \u2014 \"Name and Address of Contractor: Date: By: Signature Name: Typed or Printed (Name and Title)\" (Cover",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.581). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:46.742795"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitute W-9 Form, included as attachments to the RFP...\" (XI.B.1)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-029 \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitut",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.596). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:46.840738"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitute W-9 Form, included as attachments to the RFP...\" (XI.B.1)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-029 \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitut",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.596). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:47.494872"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitute W-9 Form, included as attachments to the RFP...\" (XI.B.1)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-029 \u2014 \"Complete Pricing Pages, Contractor Data Sheet, Past SWAM Plan(s), Proposed SWAM Plan, and Substitut",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.596). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:47.594815"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All inquires and questions regarding this solicitation must be directed to Jani",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement IT Solutions Manager, Department of Procurement Services via email at jnhall@odu.edu\" (I.B) and cover page contact fields.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-030 \u2014 \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.617). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:50.283596"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All inquires and questions regarding this solicitation must be directed to Jani",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement IT Solutions Manager, Department of Procurement Services via email at jnhall@odu.edu\" (I.B) and cover page contact fields.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-030 \u2014 \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.617). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:50.342564"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All inquires and questions regarding this solicitation must be directed to Jani",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement IT Solutions Manager, Department of Procurement Services via email at jnhall@odu.edu\" (I.B) and cover page contact fields.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-030 \u2014 \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.617). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:50.384540"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-031 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:50.391537"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-031 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:50.413524"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All inquires and questions regarding this solicitation must be directed to Jani",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement IT Solutions Manager, Department of Procurement Services via email at jnhall@odu.edu\" (I.B) and cover page contact fields.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-030 \u2014 \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.617). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:51.236053"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-031 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:51.320004"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All inquires and questions regarding this solicitation must be directed to Jani",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement IT Solutions Manager, Department of Procurement Services via email at jnhall@odu.edu\" (I.B) and cover page contact fields.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-030 \u2014 \"All inquires and questions regarding this solicitation must be directed to Janis Hall, Procurement ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.617). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:51.356983"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-031 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:51.439936"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth m",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. Contractors must register in eVA and agree to pay the Supplier Transaction Fees...\" (I.K)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-032 \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. C",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.584). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:53.593728"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth m",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. Contractors must register in eVA and agree to pay the Supplier Transaction Fees...\" (I.K)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-032 \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. C",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.584). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:53.864573"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth m",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. Contractors must register in eVA and agree to pay the Supplier Transaction Fees...\" (I.K)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-032 \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. C",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.584). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:55.737498"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth m",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. Contractors must register in eVA and agree to pay the Supplier Transaction Fees...\" (I.K)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-032 \u2014 \"All Contractors desiring to provide goods and/or services to the Commonwealth must register here. C",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.584). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:56.305682"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 See Vendor Registration / Specific Info evidence.",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: See Vendor Registration / Specific Info evidence.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-033 \u2014 See Vendor Registration / Specific Info evidence.",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.585). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:58.385662"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 See Vendor Registration / Specific Info evidence.",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: See Vendor Registration / Specific Info evidence.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-033 \u2014 See Vendor Registration / Specific Info evidence.",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.585). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:59.444055"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 See Vendor Registration / Specific Info evidence.",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: See Vendor Registration / Specific Info evidence.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-033 \u2014 See Vendor Registration / Specific Info evidence.",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.585). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:37:59.686459"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 See Vendor Registration / Specific Info evidence.",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: See Vendor Registration / Specific Info evidence.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-033 \u2014 See Vendor Registration / Specific Info evidence.",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.585). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:00.658439"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization solution for odu.edu and ODUGlobal web properties.\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-034 \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization sol",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.588). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:01.892263"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization solution for odu.edu and ODUGlobal web properties.\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-034 \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization sol",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.588). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:03.138546"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 See Vendor Registration / Specific Info evidence.",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: See Vendor Registration / Specific Info evidence.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-033 \u2014 See Vendor Registration / Specific Info evidence.",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.585). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:03.480346"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization solution for odu.edu and ODUGlobal web properties.\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-034 \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization sol",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.588). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:03.506331"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relev",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-language query handling...\" and \"Integration and Technical Fit: Describe compatibility with Drupal...\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-035 \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-langua",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.631). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:05.042469"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization solution for odu.edu and ODUGlobal web properties.\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-034 \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization sol",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.588). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:05.123404"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relev",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-language query handling...\" and \"Integration and Technical Fit: Describe compatibility with Drupal...\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-035 \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-langua",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.631). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:05.144392"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization solution for odu.edu and ODUGlobal web properties.\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-034 \u2014 \"The selected Contractor shall provide a comprehensive AI-driven site search and personalization sol",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.588). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:05.667634"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relev",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-language query handling...\" and \"Integration and Technical Fit: Describe compatibility with Drupal...\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-035 \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-langua",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.631). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:05.712675"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relev",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-language query handling...\" and \"Integration and Technical Fit: Describe compatibility with Drupal...\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-035 \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-langua",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.631). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:06.068723"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relev",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-language query handling...\" and \"Integration and Technical Fit: Describe compatibility with Drupal...\" (IV)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-035 \u2014 \"AI-Enhanced Search: Provide advanced search capabilities such as semantic relevance, natural-langua",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.631). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:07.567884"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 ",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508...\" (IV, Accessibility and Content Quality)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-036 \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508..",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.638). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:09.244560"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-037 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:09.293533"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 ",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508...\" (IV, Accessibility and Content Quality)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-036 \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508..",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.638). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:09.592557"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-037 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:09.622542"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 ",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508...\" (IV, Accessibility and Content Quality)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-036 \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508..",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.638). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:10.238591"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-037 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:10.313547"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 ",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508...\" (IV, Accessibility and Content Quality)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-036 \u2014 \"Describe capabilities that support accessibility standards, including WCAG 2.1 AA and Section 508..",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.638). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:10.645356"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 Not mentioned in the RFP.",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Not mentioned in the RFP.\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-037 \u2014 Not mentioned in the RFP.",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.536). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:10.679337"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe compatibility with Drupal and related web technologies, available APIs and modules, security and authentication considerations, indexing methods, and the approach for integrating with the University's existing digital environment.\" (IV, Integration and Technical Fit)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-038 \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs and modules, securi",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.654). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:13.049692"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe compatibility with Drupal and related web technologies, available APIs and modules, security and authentication considerations, indexing methods, and the approach for integrating with the University's existing digital environment.\" (IV, Integration and Technical Fit)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-038 \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs and modules, securi",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.654). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:13.242452"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe compatibility with Drupal and related web technologies, available APIs and modules, security and authentication considerations, indexing methods, and the approach for integrating with the University's existing digital environment.\" (IV, Integration and Technical Fit)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-038 \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs and modules, securi",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.654). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:13.701471"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Tom Williams, Operations Technology Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs",
+        "body": "Hi Tom Williams, Operations Technology Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: \"Describe compatibility with Drupal and related web technologies, available APIs and modules, security and authentication considerations, indexing methods, and the approach for integrating with the University's existing digital environment.\" (IV, Integration and Technical Fit)\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: \n- Mitigation suggested: \n\nBest match: FieldOps Pro\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-038 \u2014 \"Describe compatibility with Drupal and related web technologies, available APIs and modules, securi",
+      "explanation": "Best match: FieldOps Pro (similarity: 0.654). Draft email to Tom Williams, Operations Technology Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-07-31T18:38:13.988511"
+    }
+  ],
+  "0d1c6bbc": [
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month peri",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month period starting September 1, 2026, and ending August 31, 2027\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: The company's financial standing indicates a strong revenue and bonding capacity, but we need to review their technical capability to provide the required licenses.\n- Mitigation suggested: We will review the company's technical capability to ensure they can provide the required licenses and perform a thorough risk assessment.\n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:REQ-002 \u2014 The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month period starting Septembe",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.651). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "applied",
+      "timestamp": "2026-07-31T18:42:32.340103"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)\n- Module 2 status: Caution\n- Risk level: Medium\n- Reasoning: The company's technical capability includes AI-powered enterprise search, which meets the requirement for MBE. However, there is no evidence of the company being a Minority Business Enterprise (MBE) itself.\n- Mitigation suggested: The company will need to identify and partner with a certified MBE to meet the subcontracting goal. This may require additional time and resources to establish a relationship with a qualified partner.\n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-022 \u2014 MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.632). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "discarded",
+      "timestamp": "2026-07-31T18:42:32.393071"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month peri",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month period starting September 1, 2026, and ending August 31, 2027\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: The company's financial standing indicates a strong revenue and bonding capacity, but we need to review their technical capability to provide the required licenses.\n- Mitigation suggested: We will review the company's technical capability to ensure they can provide the required licenses and perform a thorough risk assessment.\n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:REQ-002 \u2014 The vendor shall provide 600,000 FIP-Cloud-Core-EXT licenses for a 12-month period starting Septembe",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.651). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-08-01T18:56:26.598550"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Dr. Priya Patel, Data Solutions Director",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)",
+        "body": "Hi Dr. Priya Patel, Data Solutions Director,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)\n- Module 2 status: Caution\n- Risk level: Medium\n- Reasoning: The company's technical capability includes AI-powered enterprise search, which meets the requirement for MBE. However, there is no evidence of the company being a Minority Business Enterprise (MBE) itself.\n- Mitigation suggested: The company will need to identify and partner with a certified MBE to meet the subcontracting goal. This may require additional time and resources to establish a relationship with a qualified partner.\n\nBest match: DataBridge Analytics\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-022 \u2014 MBE Subcontracting Goal: 0 % (Key Information Summary Sheet, Page 2)",
+      "explanation": "Best match: DataBridge Analytics (similarity: 0.632). Draft email to Dr. Priya Patel, Data Solutions Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-08-01T18:56:26.646294"
+    }
+  ],
+  "7c9d9c6e": [
+    {
+      "action_type": "draft_email",
+      "target_id": "James Chen, Cybersecurity Practice Lead",
+      "payload": {
+        "subject": "Partner opportunity: Operations gap \u2014 Are you or your firm certified through the Commonwealth\u2019s Department of Small Bu",
+        "body": "Hi James Chen, Cybersecurity Practice Lead,\n\nWe are reviewing an RFP opportunity and identified a Operations capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: Are you or your firm certified through the Commonwealth\u2019s Department of Small Business and Supplier Diversity? (Page 1)\n- Module 2 status: No-Go\n- Risk level: High\n- Reasoning: The company is not certified through the Commonwealth\u2019s Department of Small Business and Supplier Diversity, as per the provided certification fact.\n- Mitigation suggested: The company would need to obtain the required certification to meet this requirement.\n\nBest match: SecureNet Defense\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-OPE-022 \u2014 Are you or your firm certified through the Commonwealth\u2019s Department of Small Business and Supplier ",
+      "explanation": "Best match: SecureNet Defense (similarity: 0.609). Draft email to James Chen, Cybersecurity Practice Lead.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-08-02T13:42:59.006911"
+    },
+    {
+      "action_type": "draft_email",
+      "target_id": "Maria Sanchez, Partner Relations Director",
+      "payload": {
+        "subject": "Partner opportunity: Technical gap \u2014 The Vendor shall maintain a formal security program... ensure backups are succes",
+        "body": "Hi Maria Sanchez, Partner Relations Director,\n\nWe are reviewing an RFP opportunity and identified a Technical capability gap that aligns with your expertise.\n\nGap details:\n- Requirement: The Vendor shall maintain a formal security program... ensure backups are successfully completed daily... maintain an uptime of 99.99% or greater...\n- Module 2 status: Review\n- Risk level: Medium\n- Reasoning: The company has a Quality Management Systems certification, but it does not explicitly address security considerations or uptime requirements.\n- Mitigation suggested: We will request additional information from the company regarding their security program and processes to ensure compliance with the RFP requirements.\n\nBest match: CloudTech Solutions\n\nWould you be available to discuss potential collaboration on this?\n\nBest regards"
+      },
+      "reason": "Partner match for gap:CHK-TEC-036 \u2014 The Vendor shall maintain a formal security program... ensure backups are successfully completed dai",
+      "explanation": "Best match: CloudTech Solutions (similarity: 0.599). Draft email to Maria Sanchez, Partner Relations Director.",
+      "confidence": "high",
+      "status": "proposed",
+      "timestamp": "2026-08-02T13:43:02.619747"
+    }
+  ]
+}

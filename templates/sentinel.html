@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFP Sentinel — {{ title }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        body { background: var(--bg); margin: 0; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left h1 { font-size: 16px; font-weight: 700; color: var(--text); margin: 0; }
+        .header-left .sub { font-size: 12px; color: var(--text-muted); }
+        .header-left .sub span { margin-right: 12px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-actions a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: all var(--transition); }
+        .header-actions a:hover { background: var(--primary-light); color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; background: var(--primary-light); color: var(--primary); }
+        .chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .msg { display: flex; flex-direction: column; gap: 4px; max-width: 90%; }
+        .msg.user { align-self: flex-end; align-items: flex-end; }
+        .msg.bot { align-self: flex-start; align-items: flex-start; }
+        .msg-bubble { padding: 10px 16px; border-radius: var(--radius); font-size: 14px; line-height: 1.6; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+        .msg.user .msg-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .msg.bot .msg-bubble { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+        .msg-citations { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .citation-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; background: var(--primary-light); color: var(--primary); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .citation-tag .confidence-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .confidence-dot.high { background: var(--green); }
+        .confidence-dot.low { background: var(--amber); }
+        .input-area { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--surface); padding: 16px 24px; display: flex; gap: 8px; align-items: center; max-width: 800px; margin: 0 auto; width: 100%; }
+        .input-area input { flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; outline: none; transition: all var(--transition); }
+        .input-area input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .input-area input:disabled { opacity: 0.5; }
+        .input-area button { padding: 10px 20px; background: var(--gradient); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity var(--transition); font-family: inherit; }
+        .input-area button:hover { opacity: 0.92; }
+        .input-area button:disabled { opacity: 0.5; cursor: default; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--text-muted); text-align: center; padding: 40px; gap: 12px; }
+        .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
+        .empty-state h2 { font-size: 18px; font-weight: 600; color: var(--text-secondary); margin: 0; }
+        .empty-state p { font-size: 14px; max-width: 400px; margin: 0; line-height: 1.6; }
+        .typing-indicator { display: flex; gap: 4px; padding: 4px 0; align-items: center; }
+        .typing-indicator span { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: typing 1.4s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: scale(1); } 30% { opacity: 1; transform: scale(1.2); } }
+        .welcome-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .suggestion-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface); color: var(--text-secondary); font-size: 12px; cursor: pointer; transition: all var(--transition); font-family: inherit; }
+        .suggestion-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .action-card { background: var(--surface); border: 2px solid var(--primary); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+        .action-card-header { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+        .action-card-body { font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 8px; }
+        .action-card-body .label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .action-card-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .action-card-actions button { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; transition: opacity var(--transition); }
+        .btn-apply { background: var(--primary); color: #fff; }
+        .btn-apply:hover { opacity: 0.92; }
+        .btn-discard { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border) !important; }
+        .btn-discard:hover { background: var(--bg); }
+        .action-card-actions button:disabled { opacity: 0.5; cursor: default; }
+        .note-msg { align-self: flex-start; align-items: flex-start; }
+        .note-msg .msg-bubble { background: #fffbe6; border: 1px solid #f0d974; border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+        .note-msg .msg-bubble.note-warn { background: #fff0f0; border-color: #e0a0a0; }
+        .rehearse-btn { padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); transition: all var(--transition); }
+        .rehearse-btn:hover { border-color: var(--amber); color: #b8860b; background: #fffbe6; }
+        .rehearse-btn.active { background: #b8860b; color: #fff; border-color: #b8860b; }
+        .rehearse-banner { display: none; background: #b8860b; color: #fff; text-align: center; padding: 6px 16px; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+        .rehearse-banner.visible { display: block; }
+        .chat-area.rehearsal { border-left: 4px solid #b8860b; background: #fffcf5; }
+        .rehearsal .msg.bot .msg-bubble { background: #fff8e7; border-color: #e8c87a; }
+        .rehearsal .input-area { border-top-color: #e8c87a; }
+        .partner-badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 600; background: #e6f0ff; color: #3366cc; margin-left: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <svg class="icon" viewBox="0 0 24 24" style="color:var(--primary)"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <div>
+                <h1>RFP Sentinel</h1>
+                <div class="sub">
+                    <span>{{ title }}</span>
+                    <span class="badge">{{ provider }}</span>
+                    <span>{{ filename }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="rehearse-btn" id="rehearseToggle" onclick="toggleRehearsal()">Enter Rehearsal</button>
+            <a href="/view/{{ case_id }}">Results</a>
+            <a href="/module4/{{ case_id }}">Smart Reuse</a>
+            <a href="/module5/{{ case_id }}">Compliance Shred</a>
+            <a href="/history">History</a>
+            <a href="/">Home</a>
+        </div>
+    </div>
+    <div class="rehearse-banner" id="rehearseBanner">REHEARSAL MODE — Skeptical Procurement Evaluator (read-only, no actions)</div>
+
+    <div class="chat-area" id="chatArea">
+        <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/><path d="M9 9l3-3 3 3M12 6v7"/></svg>
+            <h2>Ask about this RFP case</h2>
+            <p>Questions are answered from the structured analysis data. When a direct match is found, no LLM call is made — answers are cited with exact field paths.</p>
+            <div class="welcome-suggestions">
+                <button class="suggestion-btn" onclick="ask('What is the overall verdict?')">What is the overall verdict?</button>
+                <button class="suggestion-btn" onclick="ask('What are the deliverables?')">What are the deliverables?</button>
+                <button class="suggestion-btn" onclick="ask('What are the key risks?')">What are the key risks?</button>
+                <button class="suggestion-btn" onclick="ask('Payment terms and insurance')">Payment terms and insurance</button>
+                <button class="suggestion-btn" onclick="ask('What is the timeline?')">What is the timeline?</button>
+                <button class="suggestion-btn" onclick="ask('Key requirements')">Key requirements</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="questionInput" placeholder="Ask a question about this case..." autofocus
+               onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();ask(this.value);}">
+        <button id="sendBtn" onclick="ask(document.getElementById('questionInput').value)">Ask</button>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        var caseId = '{{ case_id }}';
+        var chatArea = document.getElementById('chatArea');
+        var emptyState = document.getElementById('emptyState');
+        var questionInput = document.getElementById('questionInput');
+        var sendBtn = document.getElementById('sendBtn');
+        var isWaiting = false;
+        var rehearsalMode = false;
+        var rehearseToggle = document.getElementById('rehearseToggle');
+        var rehearseBanner = document.getElementById('rehearseBanner');
+
+        // --- Helpers ---
+
+        function addMessage(role, text, citations, confidence) {
+            emptyState && (emptyState.style.display = 'none');
+            var div = document.createElement('div');
+            div.className = 'msg ' + role;
+            var bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.textContent = text;
+            div.appendChild(bubble);
+            if (citations && citations.length > 0) {
+                var cites = document.createElement('div');
+                cites.className = 'msg-citations';
+                citations.forEach(function(field) {
+                    var tag = document.createElement('span');
+                    tag.className = 'citation-tag';
+                    var dot = document.createElement('span');
+                    dot.className = 'confidence-dot ' + (confidence === 'high' ? 'high' : 'low');
+                    tag.appendChild(dot);
+                    var label = document.createElement('span');
+                    label.textContent = field;
+                    tag.appendChild(label);
+                    cites.appendChild(tag);
+                });
+                div.appendChild(cites);
+            }
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addActionCard(question, action) {
+            emptyState && (emptyState.style.display = 'none');
+            if (question) addMessage('user', question);
+            var div = document.createElement('div');
+            div.className = 'msg bot';
+            var card = document.createElement('div');
+            card.className = 'action-card';
+            card.innerHTML =
+                '<div class="action-card-header">\u26a1 Proposed Action</div>' +
+                '<div class="action-card-body">' +
+                '<div class="label">Reason</div><div>' + escapeHtml(action.reason || '') + '</div>' +
+                '<div class="label" style="margin-top:8px">Action</div><div>' +
+                escapeHtml(action.action_type) +
+                (action.target_id ? ' \u2192 ' + escapeHtml(action.target_id) : '') +
+                '</div>' +
+                (action.explanation ? '<div class="label" style="margin-top:8px">What will happen</div><div>' + escapeHtml(action.explanation) + '</div>' : '') +
+                '</div>' +
+                '<div class="action-card-actions">' +
+                '<button class="btn-apply" onclick="applyAction(' + action.action_idx + ', this)">Apply</button>' +
+                '<button class="btn-discard" onclick="discardAction(' + action.action_idx + ', this)">Discard</button>' +
+                '</div>';
+            div.appendChild(card);
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addNote(msg, isWarn) {
+            emptyState && (emptyState.style.display = 'none');
+            var div = document.createElement('div');
+            div.className = 'msg note-msg';
+            var bubble = document.createElement('div');
+            bubble.className = 'msg-bubble' + (isWarn ? ' note-warn' : '');
+            bubble.textContent = msg;
+            div.appendChild(bubble);
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addRehearsalMessage(text, citedItems) {
+            emptyState && (emptyState.style.display = 'none');
+            var div = document.createElement('div');
+            div.className = 'msg bot';
+            var bubble = document.createElement('div');
+            bubble.className = 'msg-bubble';
+            bubble.textContent = text;
+            div.appendChild(bubble);
+            if (citedItems && citedItems.length > 0) {
+                var cites = document.createElement('div');
+                cites.className = 'msg-citations';
+                citedItems.forEach(function(id) {
+                    var tag = document.createElement('span');
+                    tag.className = 'citation-tag';
+                    tag.innerHTML = '<span style="color:#b8860b;font-weight:700">\u26a0</span><span>' + escapeHtml(id) + '</span>';
+                    cites.appendChild(tag);
+                });
+                div.appendChild(cites);
+            }
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        // --- Rehearsal Mode Toggle ---
+
+        function toggleRehearsal() {
+            rehearsalMode = !rehearsalMode;
+            if (rehearsalMode) {
+                rehearseToggle.textContent = 'Exit Rehearsal';
+                rehearseToggle.className = 'rehearse-btn active';
+                rehearseBanner.className = 'rehearse-banner visible';
+                chatArea.className = 'chat-area rehearsal';
+                questionInput.placeholder = 'Ask the procurement evaluator...';
+                addNote('Entered Rehearsal Mode. The response persona is now a skeptical procurement evaluator. All objections are grounded in Module 2 findings only.', false);
+            } else {
+                rehearseToggle.textContent = 'Enter Rehearsal';
+                rehearseToggle.className = 'rehearse-btn';
+                rehearseBanner.className = 'rehearse-banner';
+                chatArea.className = 'chat-area';
+                questionInput.placeholder = 'Ask a question about this case...';
+                addNote('Exited Rehearsal Mode. Returning to normal Q&A.', false);
+            }
+        }
+
+        function showTyping() {
+            var div = document.createElement('div');
+            div.className = 'msg bot';
+            div.id = 'typingIndicator';
+            var indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.innerHTML = '<span></span><span></span><span></span>';
+            div.appendChild(indicator);
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function removeTyping() {
+            var el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        // --- Action Apply / Discard ---
+
+        function applyAction(idx, btn) {
+            if (btn.disabled) return;
+            btn.disabled = true; btn.textContent = 'Applying...';
+            var parent = btn.closest('.action-card-actions');
+            if (parent) {
+                var btns = parent.querySelectorAll('button');
+                for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+            }
+            fetch('/api/case/' + caseId + '/action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action_idx: idx, verdict: 'apply'})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var card = btn.closest('.action-card');
+                if (data.ok) {
+                    var status = document.createElement('div');
+                    status.style.cssText = 'margin-top:8px;padding:6px 10px;background:#e6f7e6;border-radius:6px;font-size:13px;color:#2a7a2a;';
+                    status.textContent = '\u2713 ' + (data.message || 'Applied');
+                    card.appendChild(status);
+                } else {
+                    var err = document.createElement('div');
+                    err.style.cssText = 'margin-top:8px;padding:6px 10px;background:#ffe6e6;border-radius:6px;font-size:13px;color:#c00;';
+                    err.textContent = '\u2717 ' + (data.error || 'Failed');
+                    card.appendChild(err);
+                }
+            })
+            .catch(function() {
+                var err = document.createElement('div');
+                err.style.cssText = 'margin-top:8px;padding:6px 10px;background:#ffe6e6;border-radius:6px;font-size:13px;color:#c00;';
+                err.textContent = '\u2717 Network error';
+                btn.closest('.action-card').appendChild(err);
+            });
+        }
+
+        function discardAction(idx, btn) {
+            if (btn.disabled) return;
+            btn.disabled = true; btn.textContent = 'Discarding...';
+            var parent = btn.closest('.action-card-actions');
+            if (parent) {
+                var btns = parent.querySelectorAll('button');
+                for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+            }
+            fetch('/api/case/' + caseId + '/action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action_idx: idx, verdict: 'discard'})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var card = btn.closest('.action-card');
+                var status = document.createElement('div');
+                status.style.cssText = 'margin-top:8px;padding:6px 10px;border-radius:6px;font-size:13px;color:#666;background:#f5f5f5;';
+                status.textContent = 'Discarded';
+                card.appendChild(status);
+            })
+            .catch(function() {
+                btn.disabled = false; btn.textContent = 'Discard';
+            });
+        }
+
+        // --- Main ask ---
+
+        function ask(question) {
+            question = (question || '').trim();
+            if (!question || isWaiting) return;
+            questionInput.value = '';
+            isWaiting = true;
+            sendBtn.disabled = true;
+            questionInput.disabled = true;
+            addMessage('user', question);
+            showTyping();
+            var endpoint = rehearsalMode ? '/api/case/' + caseId + '/rehearse' : '/api/case/' + caseId + '/ask';
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({question: question})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                removeTyping();
+                if (data.error) {
+                    addMessage('bot', 'Error: ' + data.error);
+                } else if (data.response_type === 'action_card') {
+                    addActionCard(null, data.action);
+                } else if (data.response_type === 'rehearsal') {
+                    addRehearsalMessage(data.answer, data.cited_items || []);
+                } else {
+                    addMessage('bot', data.answer, data.cited_fields || [], data.confidence || 'low');
+                }
+            })
+            .catch(function(err) {
+                removeTyping();
+                addMessage('bot', 'Network error: ' + err.message);
+            })
+            .then(function() {
+                isWaiting = false;
+                sendBtn.disabled = false;
+                questionInput.disabled = false;
+                questionInput.focus();
+            });
+        }
+
+        // --- Sentinel Notes (load on page start) ---
+
+        function loadNotes() {
+            fetch('/api/case/' + caseId + '/notes')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.notes && data.notes.length > 0) {
+                    var shown = sessionStorage.getItem('sentinelNotes_' + caseId) || '';
+                    data.notes.forEach(function(n) {
+                        if (shown.indexOf(n.timestamp) === -1) {
+                            var isWarn = n.message.indexOf('\u26a0') !== -1;
+                            addNote(n.message, isWarn);
+                            shown += (shown ? ',' : '') + n.timestamp;
+                        }
+                    });
+                    sessionStorage.setItem('sentinelNotes_' + caseId, shown);
+                }
+            })
+            .catch(function() {});
+        }
+
+        // --- Partner Matches (check on page start) ---
+
+        function loadPartnerMatches() {
+            fetch('/api/case/' + caseId + '/partner-matches')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.cards && data.cards.length > 0) {
+                    data.cards.forEach(function(c) {
+                        if (c.response_type === 'action_card') {
+                            addActionCard(null, c.action);
+                        }
+                    });
+                }
+            })
+            .catch(function() {});
+        }
+
+        loadNotes();
+        loadPartnerMatches();
+    </script>
+</body>
+</html>

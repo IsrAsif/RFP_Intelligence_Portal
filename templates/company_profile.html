@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Profile — RFP Automation Portal</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .nav{position:relative;z-index:10;display:flex;justify-content:flex-end;align-items:center;padding:20px 80px 0 0;gap:12px}
+        .nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;padding:6px 14px;border-radius:var(--radius-sm);transition:all var(--transition)}
+        .nav a:hover{background:var(--primary-light);color:var(--primary)}
+        .main{max-width:900px;margin:0 auto;padding:24px 24px 60px}
+        h1{font-size:24px;font-weight:700;color:var(--text);margin-bottom:6px}
+        .subtitle{font-size:14px;color:var(--text-secondary);margin-bottom:28px}
+        .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+        .section h2{font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .section h2 svg{width:18px;height:18px;color:var(--primary)}
+        label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:4px;margin-top:12px}
+        label:first-child{margin-top:0}
+        input,textarea,select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:all var(--transition)}
+        input:focus,textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+        textarea{resize:vertical;min-height:60px}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all var(--transition)}
+        .btn-primary{background:var(--gradient);color:#fff;box-shadow:var(--shadow)}
+        .btn-primary:hover{opacity:0.9;transform:translateY(-1px)}
+        .btn-secondary{background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)}
+        .btn-secondary:hover{background:var(--surface-hover);color:var(--text)}
+        .actions{display:flex;gap:12px;margin-top:24px;justify-content:flex-end}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;z-index:1000;transition:transform 0.3s ease;font-size:14px}
+        .toast.show{transform:translateX(-50%) translateY(0)}
+        .fact-count{font-size:12px;color:var(--text-muted);margin-left:auto}
+        .repeatable-group{border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;position:relative;background:var(--bg)}
+        .repeatable-group .remove-btn{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:4px}
+        .repeatable-group .remove-btn:hover{color:var(--red);background:var(--red-light)}
+        .add-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px dashed var(--border-strong);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);font-size:13px;font-family:inherit;cursor:pointer;transition:all var(--transition);margin-top:8px}
+        .add-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+        @media(max-width:640px){.row,.row-3{grid-template-columns:1fr}.nav{padding:16px 24px 0}}
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+        <a href="/company_profile" style="color:var(--primary);font-weight:600">Company Profile</a>
+    </nav>
+    <div class="main">
+        <h1>Company Profile</h1>
+        <p class="subtitle">Populate your company's facts for Module 2 compliance verification. All fields are optional — leave blank if not applicable.</p>
+
+        <form id="profileForm">
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    General
+                </h2>
+                <label>Company Name</label>
+                <input type="text" name="company_name" value="{{ profile.get('company_name', '') }}" placeholder="Acme Corporation">
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Certifications
+                </h2>
+                <div id="certifications">
+                    {% for cert in profile.get('certifications', []) %}
+                    <div class="repeatable-group" data-section="certifications">
+                        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>
+                        <div class="row">
+                            <div><label>Name</label><input type="text" name="cert_name" value="{{ cert.get('name', '') }}" placeholder="ISO 9001"></div>
+                            <div><label>Number</label><input type="text" name="cert_number" value="{{ cert.get('number', '') }}" placeholder="ABC123"></div>
+                        </div>
+                        <div class="row">
+                            <div><label>Expiry</label><input type="text" name="cert_expiry" value="{{ cert.get('expiry', '') }}" placeholder="2027-01-01"></div>
+                            <div><label>Scope</label><input type="text" name="cert_scope" value="{{ cert.get('scope', '') }}" placeholder="Quality Management"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" onclick="addCert()">+ Add Certification</button>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Insurance Coverage
+                </h2>
+                <div id="insurance">
+                    {% for ins in profile.get('insurance', []) %}
+                    <div class="repeatable-group" data-section="insurance">
+                        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>
+                        <div class="row-3">
+                            <div><label>Type</label><input type="text" name="ins_type" value="{{ ins.get('type', '') }}" placeholder="General Liability"></div>
+                            <div><label>Coverage Amount ($)</label><input type="number" name="ins_amount" value="{{ ins.get('coverage_amount', '') }}" placeholder="5000000"></div>
+                            <div><label>Provider</label><input type="text" name="ins_provider" value="{{ ins.get('provider', '') }}" placeholder="ABC Insurance"></div>
+                        </div>
+                        <div class="row">
+                            <div><label>Policy Number</label><input type="text" name="ins_policy" value="{{ ins.get('policy_number', '') }}" placeholder="GL-1234"></div>
+                            <div><label>Expiry</label><input type="text" name="ins_expiry" value="{{ ins.get('expiry', '') }}" placeholder="2027-01-01"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" onclick="addInsurance()">+ Add Insurance</button>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Payment Terms
+                </h2>
+                {% set pt = profile.get('payment_terms', {}) %}
+                <div class="row">
+                    <div><label>Standard Terms</label><input type="text" name="pt_standard" value="{{ pt.get('standard_terms', 'NET30') }}" placeholder="NET30"></div>
+                    <div><label>Accepted Terms (comma-separated)</label><input type="text" name="pt_accepted" value="{{ pt.get('accepted_terms', ['NET30']) | join(', ') }}" placeholder="NET30, NET15, Due on Receipt"></div>
+                </div>
+                <label>Notes</label>
+                <textarea name="pt_notes" placeholder="Additional notes about payment terms...">{{ pt.get('notes', '') }}</textarea>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Past Performance / Project History
+                </h2>
+                <div id="past_performance">
+                    {% for pp in profile.get('past_performance', []) %}
+                    <div class="repeatable-group" data-section="past_performance">
+                        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>
+                        <div class="row">
+                            <div><label>Client</label><input type="text" name="pp_client" value="{{ pp.get('client', '') }}" placeholder="ABC Corp"></div>
+                            <div><label>Project</label><input type="text" name="pp_project" value="{{ pp.get('project', '') }}" placeholder="IT Modernization"></div>
+                        </div>
+                        <div class="row-3">
+                            <div><label>Value ($)</label><input type="number" name="pp_value" value="{{ pp.get('value', '') }}" placeholder="5000000"></div>
+                            <div><label>Start Date</label><input type="text" name="pp_start" value="{{ pp.get('start_date', '') }}" placeholder="2023-01"></div>
+                            <div><label>End Date</label><input type="text" name="pp_end" value="{{ pp.get('end_date', '') }}" placeholder="2024-06"></div>
+                        </div>
+                        <label>Description</label>
+                        <textarea name="pp_desc" placeholder="Brief project description...">{{ pp.get('description', '') }}</textarea>
+                        <div class="row">
+                            <div><label>Contact</label><input type="text" name="pp_contact" value="{{ pp.get('contact', '') }}" placeholder="John Doe"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" onclick="addPastPerformance()">+ Add Project</button>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Technical Capabilities
+                </h2>
+                <div id="technical_capabilities">
+                    {% for tc in profile.get('technical_capabilities', []) %}
+                    <div class="repeatable-group" data-section="technical_capabilities">
+                        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>
+                        <div class="row">
+                            <div><label>Capability Name</label><input type="text" name="tc_name" value="{{ tc.get('name', '') }}" placeholder="Cloud Migration"></div>
+                            <div><label>Technologies (comma-separated)</label><input type="text" name="tc_tech" value="{{ tc.get('technologies', []) | join(', ') }}" placeholder="AWS, Azure, GCP"></div>
+                        </div>
+                        <label>Description</label>
+                        <textarea name="tc_desc" placeholder="Description of this capability...">{{ tc.get('description', '') }}</textarea>
+                        <label>Required Certifications (comma-separated)</label>
+                        <input type="text" name="tc_certs" value="{{ tc.get('certifications_required', []) | join(', ') }}" placeholder="AWS Solutions Architect">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" onclick="addTechCap()">+ Add Capability</button>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><path d="M12 20V10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 20V4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 20v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Financial Standing
+                </h2>
+                {% set fs = profile.get('financial_standing', {}) %}
+                <div class="row-3">
+                    <div><label>Annual Revenue ($)</label><input type="number" name="fs_revenue" value="{{ fs.get('annual_revenue', '') }}" placeholder="50000000"></div>
+                    <div><label>Years in Business</label><input type="number" name="fs_years" value="{{ fs.get('years_in_business', '') }}" placeholder="15"></div>
+                    <div><label>DUNS Number</label><input type="text" name="fs_duns" value="{{ fs.get('duns_number', '') }}" placeholder="12-345-6789"></div>
+                </div>
+                <div class="row">
+                    <div><label>Bonding Capacity ($)</label><input type="number" name="fs_bonding" value="{{ fs.get('bonding_capacity', '') }}" placeholder="20000000"></div>
+                    <div><label>Credit Rating</label><input type="text" name="fs_credit" value="{{ fs.get('credit_rating', '') }}" placeholder="A"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Key Personnel
+                </h2>
+                <div id="personnel">
+                    {% for p in profile.get('personnel', []) %}
+                    <div class="repeatable-group" data-section="personnel">
+                        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>
+                        <div class="row-3">
+                            <div><label>Name</label><input type="text" name="per_name" value="{{ p.get('name', '') }}" placeholder="Jane Smith"></div>
+                            <div><label>Role</label><input type="text" name="per_role" value="{{ p.get('role', '') }}" placeholder="Project Manager"></div>
+                            <div><label>Experience (years)</label><input type="number" name="per_exp" value="{{ p.get('experience_years', '') }}" placeholder="10"></div>
+                        </div>
+                        <label>Certifications (comma-separated)</label>
+                        <input type="text" name="per_certs" value="{{ p.get('certifications', []) | join(', ') }}" placeholder="PMP, Scrum Master">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" onclick="addPersonnel()">+ Add Personnel</button>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn btn-secondary" onclick="window.location='/'">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Save Profile
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="toast" id="toast"><span class="toast-msg"></span></div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        function collectProfile() {
+            var data = {company_name: '', certifications: [], insurance: [], payment_terms: {standard_terms: '', accepted_terms: [], notes: ''}, past_performance: [], technical_capabilities: [], financial_standing: {}, personnel: []};
+            data.company_name = document.querySelector('[name="company_name"]').value;
+
+            document.querySelectorAll('[data-section="certifications"]').forEach(function(g) {
+                var n = g.querySelector('[name="cert_name"]').value;
+                if (n) data.certifications.push({name: n, number: g.querySelector('[name="cert_number"]').value, expiry: g.querySelector('[name="cert_expiry"]').value, scope: g.querySelector('[name="cert_scope"]').value});
+            });
+            if (!data.certifications.length) data.certifications = [{name:'',number:'',expiry:'',scope:''}];
+
+            document.querySelectorAll('[data-section="insurance"]').forEach(function(g) {
+                var t = g.querySelector('[name="ins_type"]').value;
+                if (t) data.insurance.push({type: t, coverage_amount: parseFloat(g.querySelector('[name="ins_amount"]').value) || 0, provider: g.querySelector('[name="ins_provider"]').value, policy_number: g.querySelector('[name="ins_policy"]').value, expiry: g.querySelector('[name="ins_expiry"]').value});
+            });
+            if (!data.insurance.length) data.insurance = [{type:'',coverage_amount:0,provider:'',policy_number:'',expiry:''}];
+
+            data.payment_terms.standard_terms = document.querySelector('[name="pt_standard"]').value;
+            data.payment_terms.accepted_terms = document.querySelector('[name="pt_accepted"]').value.split(',').map(function(s){return s.trim()}).filter(Boolean);
+            data.payment_terms.notes = document.querySelector('[name="pt_notes"]').value;
+
+            document.querySelectorAll('[data-section="past_performance"]').forEach(function(g) {
+                var c = g.querySelector('[name="pp_client"]').value;
+                var p = g.querySelector('[name="pp_project"]').value;
+                if (c || p) data.past_performance.push({client: c, project: p, value: parseFloat(g.querySelector('[name="pp_value"]').value) || 0, start_date: g.querySelector('[name="pp_start"]').value, end_date: g.querySelector('[name="pp_end"]').value, description: g.querySelector('[name="pp_desc"]').value, contact: g.querySelector('[name="pp_contact"]').value});
+            });
+            if (!data.past_performance.length) data.past_performance = [{client:'',project:'',value:0,start_date:'',end_date:'',description:'',contact:''}];
+
+            document.querySelectorAll('[data-section="technical_capabilities"]').forEach(function(g) {
+                var n = g.querySelector('[name="tc_name"]').value;
+                if (n) data.technical_capabilities.push({name: n, description: g.querySelector('[name="tc_desc"]').value, technologies: g.querySelector('[name="tc_tech"]').value.split(',').map(function(s){return s.trim()}).filter(Boolean), certifications_required: g.querySelector('[name="tc_certs"]').value.split(',').map(function(s){return s.trim()}).filter(Boolean)});
+            });
+            if (!data.technical_capabilities.length) data.technical_capabilities = [{name:'',description:'',technologies:[],certifications_required:[]}];
+
+            data.financial_standing = {annual_revenue: parseFloat(document.querySelector('[name="fs_revenue"]').value) || 0, years_in_business: parseInt(document.querySelector('[name="fs_years"]').value) || 0, duns_number: document.querySelector('[name="fs_duns"]').value, bonding_capacity: parseFloat(document.querySelector('[name="fs_bonding"]').value) || 0, credit_rating: document.querySelector('[name="fs_credit"]').value};
+
+            document.querySelectorAll('[data-section="personnel"]').forEach(function(g) {
+                var n = g.querySelector('[name="per_name"]').value;
+                if (n) data.personnel.push({name: n, role: g.querySelector('[name="per_role"]').value, certifications: g.querySelector('[name="per_certs"]').value.split(',').map(function(s){return s.trim()}).filter(Boolean), experience_years: parseInt(g.querySelector('[name="per_exp"]').value) || 0});
+            });
+            if (!data.personnel.length) data.personnel = [{name:'',role:'',certifications:[],experience_years:0}];
+
+            return data;
+        }
+
+        function addRepeatable(containerId, html) {
+            var c = document.getElementById(containerId);
+            var d = document.createElement('div');
+            d.className = 'repeatable-group';
+            d.setAttribute('data-section', cIdmap[containerId]);
+            d.innerHTML = '<button type="button" class="remove-btn" onclick="this.parentElement.remove()">&times;</button>' + html;
+            c.appendChild(d);
+        }
+        var cIdmap = {certifications:'certifications',insurance:'insurance',past_performance:'past_performance',technical_capabilities:'technical_capabilities',personnel:'personnel'};
+
+        function addCert() { addRepeatable('certifications', '<div class="row"><div><label>Name</label><input type="text" name="cert_name" placeholder="ISO 9001"></div><div><label>Number</label><input type="text" name="cert_number" placeholder="ABC123"></div></div><div class="row"><div><label>Expiry</label><input type="text" name="cert_expiry" placeholder="2027-01-01"></div><div><label>Scope</label><input type="text" name="cert_scope" placeholder="Quality Management"></div></div>'); }
+        function addInsurance() { addRepeatable('insurance', '<div class="row-3"><div><label>Type</label><input type="text" name="ins_type" placeholder="General Liability"></div><div><label>Coverage Amount ($)</label><input type="number" name="ins_amount" placeholder="5000000"></div><div><label>Provider</label><input type="text" name="ins_provider" placeholder="ABC Insurance"></div></div><div class="row"><div><label>Policy Number</label><input type="text" name="ins_policy" placeholder="GL-1234"></div><div><label>Expiry</label><input type="text" name="ins_expiry" placeholder="2027-01-01"></div></div>'); }
+        function addPastPerformance() { addRepeatable('past_performance', '<div class="row"><div><label>Client</label><input type="text" name="pp_client" placeholder="ABC Corp"></div><div><label>Project</label><input type="text" name="pp_project" placeholder="IT Modernization"></div></div><div class="row-3"><div><label>Value ($)</label><input type="number" name="pp_value" placeholder="5000000"></div><div><label>Start Date</label><input type="text" name="pp_start" placeholder="2023-01"></div><div><label>End Date</label><input type="text" name="pp_end" placeholder="2024-06"></div></div><label>Description</label><textarea name="pp_desc" placeholder="Brief project description..."></textarea><div class="row"><div><label>Contact</label><input type="text" name="pp_contact" placeholder="John Doe"></div></div>'); }
+        function addTechCap() { addRepeatable('technical_capabilities', '<div class="row"><div><label>Capability Name</label><input type="text" name="tc_name" placeholder="Cloud Migration"></div><div><label>Technologies (comma-separated)</label><input type="text" name="tc_tech" placeholder="AWS, Azure, GCP"></div></div><label>Description</label><textarea name="tc_desc" placeholder="Description of this capability..."></textarea><label>Required Certifications (comma-separated)</label><input type="text" name="tc_certs" placeholder="AWS Solutions Architect">'); }
+        function addPersonnel() { addRepeatable('personnel', '<div class="row-3"><div><label>Name</label><input type="text" name="per_name" placeholder="Jane Smith"></div><div><label>Role</label><input type="text" name="per_role" placeholder="Project Manager"></div><div><label>Experience (years)</label><input type="number" name="per_exp" placeholder="10"></div></div><label>Certifications (comma-separated)</label><input type="text" name="per_certs" placeholder="PMP, Scrum Master">'); }
+
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var data = collectProfile();
+            fetch('/api/company_profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(function(r){return r.json()}).then(function(d){
+                var t = document.getElementById('toast');
+                t.querySelector('.toast-msg').textContent = d.ok ? 'Profile saved! ' + d.fact_count + ' facts indexed.' : 'Error: ' + (d.error || 'Unknown');
+                t.classList.add('show');
+                setTimeout(function(){t.classList.remove('show')}, 3000);
+            }).catch(function(err){
+                var t = document.getElementById('toast');
+                t.querySelector('.toast-msg').textContent = 'Save failed: ' + err.message;
+                t.classList.add('show');
+                setTimeout(function(){t.classList.remove('show')}, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

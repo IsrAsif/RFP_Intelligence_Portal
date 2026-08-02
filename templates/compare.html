@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare RFPs</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .container { max-width: 1100px; margin: 0 auto; padding: 60px 24px 24px; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .header h1 {
+            font-size: 26px; font-weight: 800; color: var(--text);
+        }
+        .header .back { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px; }
+        .header .back:hover { background: var(--primary-light); color: var(--primary); }
+        .header .back:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .col {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+        }
+        .col h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 8px; }
+        .col .stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .col .stat .label { color: var(--text-secondary); }
+        .col .stat .value { font-weight: 600; }
+        .col .section-title {
+            font-size: 13px; font-weight: 600; color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin: 16px 0 8px; display: flex; align-items: center; gap: 6px;
+        }
+        .col ul { list-style: none; }
+        .col ul li { padding: 6px 10px; background: var(--bg); border-radius: 6px; margin-bottom: 4px; font-size: 13px; color: var(--text-secondary); }
+        .tree-compare { list-style: none; padding: 0; margin: 0; }
+        .tree-compare-parent {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); margin-bottom: 8px; overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .tree-compare-parent-label {
+            padding: 8px 12px; font-weight: 700; font-size: 13px;
+            color: var(--text); background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer; user-select: none;
+            transition: background var(--transition);
+        }
+        .tree-compare-parent-label:hover { background: var(--primary-light); }
+        .tree-compare-parent-label .toggle-icon {
+            width: 14px; height: 14px; flex-shrink: 0;
+            color: var(--text-muted); transition: transform 0.2s ease;
+        }
+        .tree-compare-parent.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .tree-compare-parent-label .parent-accent {
+            width: 3px; height: 16px; border-radius: 2px;
+            background: var(--primary); flex-shrink: 0;
+        }
+        .tree-compare-children { list-style: none; padding: 0; margin: 0; transition: all 0.2s ease; }
+        .tree-compare-parent.collapsed .tree-compare-children { display: none; }
+        .tree-compare-child {
+            padding: 5px 10px 5px 24px; font-size: 12px;
+            color: var(--text-secondary); line-height: 1.4;
+            position: relative;
+        }
+        .tree-compare-child:hover { color: var(--text); background: var(--bg); }
+        .tree-compare-child::before {
+            content: ''; position: absolute; left: 10px; top: 0;
+            width: 10px; height: 11px;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .tree-compare-child::after {
+            content: ''; position: absolute; left: 10px; top: 11px;
+            bottom: 0; width: 1px; background: var(--border);
+        }
+        .tree-compare-child:last-child::after { display: none; }
+        .tree-compare-ref, .tree-compare-child-ref {
+            font-size: 9px; line-height: 1.3; margin: 4px 0 6px 30px; padding: 4px 6px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
+            display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center;
+            font-family: 'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+            box-shadow: var(--shadow); max-width: 92%;
+        }
+        .tree-compare-child-ref { margin-left: 44px; }
+        .tree-compare-ref .ref-file, .tree-compare-child-ref .ref-file {
+            display: inline-block; background: var(--primary-light); color: var(--primary);
+            font-weight: 700; padding: 1px 6px; border-radius: 3px; font-size: 8px;
+        }
+        .tree-compare-ref .ref-sec, .tree-compare-child-ref .ref-sec {
+            display: inline-block; background: var(--green-light); color: var(--green);
+            font-weight: 600; padding: 1px 6px; border-radius: 3px; font-size: 8px;
+        }
+        .tree-compare-ref .ref-page, .tree-compare-child-ref .ref-page {
+            display: inline-block; background: var(--amber-light); color: var(--amber);
+            font-weight: 600; padding: 1px 6px; border-radius: 3px; font-size: 8px;
+        }
+        .tree-compare-ref .ref-desc, .tree-compare-child-ref .ref-desc {
+            display: inline-block; color: var(--text-muted); font-size: 8px;
+            padding: 1px 3px;
+        }
+        .comp-search {
+            margin-bottom: 12px; position: relative;
+        }
+        .comp-search input {
+            width: 100%; padding: 8px 12px 8px 32px;
+            border: 1px solid var(--border); border-radius: 6px;
+            background: var(--bg); color: var(--text); font-size: 12px;
+            font-family: inherit; outline: none; transition: all var(--transition);
+            box-sizing: border-box;
+        }
+        .comp-search input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .comp-search-icon {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); pointer-events: none;
+        }
+        .comp-toc {
+            margin-bottom: 12px; padding: 10px 12px;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+        }
+        .comp-toc-stats { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
+        .comp-toc-stats strong { font-size: 14px; color: var(--text); }
+        .comp-toc-bar { width: 100px; height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 4px; }
+        .comp-toc-bar-fill { height: 100%; border-radius: 100px; background: var(--green); }
+        .comp-toc-anchors { display: flex; flex-wrap: wrap; gap: 4px; }
+        .comp-toc-anchors a { font-size: 10px; font-weight: 500; color: var(--primary); text-decoration: none; padding: 4px 10px; border-radius: 100px; background: var(--primary-light); transition: all var(--transition); }
+        .comp-toc-anchors a:hover { background: var(--primary); color: var(--surface); }
+        .comp-toc-anchors a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
+
+        /* ===== Amendment / Version Delta ===== */
+        .delta-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        .delta-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .delta-baseline { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .delta-summary {
+            font-size: 14px; line-height: 1.6; color: var(--text);
+            background: var(--bg); border: 1px solid var(--border);
+            border-left: 4px solid var(--primary); padding: 12px 14px; border-radius: 8px; margin-bottom: 14px;
+        }
+        .delta-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); }
+        .delta-stats .pill { padding: 3px 10px; border-radius: 100px; font-weight: 700; font-size: 11px; }
+        .pill-high { background: var(--red-light); color: var(--red); }
+        .pill-low { background: var(--amber-light); color: var(--amber); }
+        .delta-list { list-style: none; margin: 0; padding: 0; }
+        .delta-list li {
+            padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 13px;
+            background: var(--bg); border: 1px solid var(--border);
+        }
+        .delta-change-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+        .delta-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .delta-badge.added { background: var(--green-light); color: var(--green); }
+        .delta-badge.removed { background: var(--red-light); color: var(--red); }
+        .delta-badge.modified { background: var(--primary-light); color: var(--primary); }
+        .delta-sev { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+        .delta-sev.High { background: var(--red-light); color: var(--red); }
+        .delta-sev.Low { background: var(--amber-light); color: var(--amber); }
+        .delta-section { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .delta-detail { font-size: 12px; color: var(--text-secondary); word-break: break-word; }
+        .delta-empty { font-size: 13px; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="page-loader" id="pageLoader"><div class="loader-spinner"></div></div>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-package" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon" id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="container page-enter">
+        <div class="header">
+            <h1 style="display:flex;align-items:center;gap:10px">
+                <svg width="32" height="32" viewBox="0 0 64 64" style="flex-shrink:0">
+                    <rect width="64" height="64" rx="12" fill="var(--primary)"/>
+                    <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Compare RFPs
+            </h1>
+            <a href="/history" class="back">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back to History
+            </a>
+        </div>
+        {% if delta %}
+        <div class="delta-card">
+            <h2>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Amendment Delta
+            </h2>
+            <div class="delta-baseline">Changes vs baseline “{{ delta.get('baseline_title', '') }}” ({{ r1.get('title') or r1.filename }} → {{ r2.get('title') or r2.filename }})</div>
+            {% if delta.get('summary') %}
+            <div class="delta-summary">{{ delta.get('summary') }}</div>
+            {% endif %}
+            <div class="delta-stats">
+                <span class="pill pill-high">{{ delta.get('high_count', 0) }} high</span>
+                <span class="pill pill-low">{{ delta.get('low_count', 0) }} low</span>
+                {% if delta.get('usage') and delta.usage.get('prompt_tokens') is not none %}
+                <span>summary tokens: {{ delta.usage.get('prompt_tokens') }} in / {{ delta.usage.get('completion_tokens') }} out</span>
+                {% endif %}
+            </div>
+            {% if delta.get('changes') %}
+            <ul class="delta-list">
+                {% for c in delta.get('changes', []) %}
+                <li>
+                    <div class="delta-change-head">
+                        <span class="delta-badge {{ c.get('change_type', '') | lower }}">{{ c.get('change_type', '') }}</span>
+                        {% if c.get('severity') %}<span class="delta-sev {{ c.get('severity') }}">{{ c.get('severity') }}</span>{% endif %}
+                        <span class="delta-section">{{ c.get('section', '') }}</span>
+                        {% if c.get('label') %}<span style="font-weight:600">{{ c.get('label') }}</span>{% endif %}
+                    </div>
+                    {% if c.get('detail') %}<div class="delta-detail">{{ c.get('detail') }}</div>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="delta-empty">No structured changes detected.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="compare-grid">
+            <div class="col">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {{ r1.get('title') or r1.filename }}
+                </h2>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">{{ r1.filename }}</div>
+                <div class="stat"><span class="label">Words</span><span class="value">{{ r1.word_count }}</span></div>
+                <div class="stat"><span class="label">Deliverables</span><span class="value">{% if r1.results.deliverables and r1.results.deliverables[0] is mapping %}{% set dcount = r1.results.deliverables | length %}{% set ccount = namespace(v=0) %}{% for d in r1.results.deliverables %}{% if d.sub_deliverables is defined %}{% set ccount.v = ccount.v + d.sub_deliverables | length %}{% endif %}{% endfor %}{{ dcount }} / {{ ccount.v }}{% else %}{{ r1.results.deliverables | length }}{% endif %}</span></div>
+                <div class="stat"><span class="label">Risks</span><span class="value">{{ r1.results.risks | length }}</span></div>
+                <div class="section-title">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Deliverables
+                </div>
+                {% if r1.results.deliverables and r1.results.deliverables[0] is mapping %}
+                {% set r1_tc = namespace(v=0) %}{% set r1_rc = namespace(v=0) %}
+                {% for g in r1.results.deliverables %}{% if g.sub_deliverables is defined %}{% for c in g.sub_deliverables %}{% set r1_tc.v = r1_tc.v + 1 %}{% set cr = c.reference if c.reference is defined else c.get('reference', '') %}{% if cr %}{% set r1_rc.v = r1_rc.v + 1 %}{% endif %}{% endfor %}{% endif %}{% endfor %}
+                {% set r1_pct = (r1_rc.v / r1_tc.v * 100) | int if r1_tc.v > 0 else 0 %}
+                <div class="comp-toc">
+                    <div class="comp-toc-stats">
+                        <span><strong>{{ r1.results.deliverables | length }}</strong> groups</span>
+                        <span><strong>{{ r1_tc.v }}</strong> items</span>
+                        <span><strong>{{ r1_pct }}%</strong> refs <span class="comp-toc-bar"><span class="comp-toc-bar-fill" style="width:{{ r1_pct }}%"></span></span></span>
+                    </div>
+                    <div class="comp-toc-anchors">{% for g in r1.results.deliverables %}<a href="#r1-deliv-{{ loop.index }}">{{ loop.index }}. {{ g.deliverable if g.deliverable is defined else g.get('deliverable', '') }}</a>{% endfor %}</div>
+                </div>
+                <div class="comp-search">
+                    <span class="comp-search-icon"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none"/></svg></span>
+                    <input type="text" placeholder="Filter deliverables..." oninput="filterCompare(this.value, 'r1')">
+                </div>
+                <ul class="tree-compare" id="r1-tree">
+                    {% for group in r1.results.deliverables %}
+                    {% set pname = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+                    {% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+                    {% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+                    {% set outer_idx = loop.index %}
+                    <li class="tree-compare-parent" id="r1-deliv-{{ outer_idx }}" data-search="{{ pname | lower }} {{ ref | lower }}">
+                        <div class="tree-compare-parent-label" onclick="toggleCompare(this)">
+                            <svg class="toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="parent-accent"></span>
+                            <span>{{ outer_idx }}. {{ pname }}</span>
+                        </div>
+                        {% if ref %}
+                        {% set pg_raw = group.page_number if group.page_number is defined else group.get('page_number', '') %}
+                        {% set rest = ref.split(']') | last %}
+                        {% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+                        {% set parsed_page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+                        {% set page_display = ('p.' + pg_raw|string) if pg_raw else parsed_page %}
+                        {% set desc = rest.split('—') | last if '—' in rest else '' %}
+                        <li class="tree-compare-ref" title="{{ ref }}">
+                            <span class="ref-file">{{ ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ sec | trim }}</span>
+                            {% if page_display %}<span class="ref-page">{{ page_display }}</span>{% endif %}
+                            {% if desc %}<span class="ref-desc">— {{ desc | trim }}</span>{% endif %}
+                        </li>
+                        {% endif %}
+                        {% if children %}
+                        <ul class="tree-compare-children">
+                        {% for child in children %}
+                        {% if child is mapping %}
+                        {% set child_name = child.name if child.name is defined else child.get('name', '') %}
+                        {% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+                        {% else %}
+                        {% set child_name = child %}
+                        {% set child_ref = '' %}
+                        {% endif %}
+                        <li class="tree-compare-child" data-search="{{ pname | lower }} {{ child_name | lower }} {{ child_ref | lower }}">{{ outer_idx }}.{{ loop.index }} {{ child_name }}</li>
+                        {% if child_ref %}
+                        {% set cpg_raw = child.page_number if child.page_number is defined else child.get('page_number', '') %}
+                        {% set crest = child_ref.split(']') | last %}
+                        {% set csec = crest.split('p.')[0] if 'p.' in crest else crest.split('—')[0] %}
+                        {% set cparsed_page = 'p.' + crest.split('p.')[1].split('—')[0] | trim if 'p.' in crest else '' %}
+                        {% set cpage_display = ('p.' + cpg_raw|string) if cpg_raw else cparsed_page %}
+                        {% set cdesc = crest.split('—') | last if '—' in crest else '' %}
+                        <li class="tree-compare-child-ref" title="{{ child_ref }}">
+                            <span class="ref-file">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ csec | trim }}</span>
+                            {% if cpage_display %}<span class="ref-page">{{ cpage_display }}</span>{% endif %}
+                            {% if cdesc %}<span class="ref-desc">— {{ cdesc | trim }}</span>{% endif %}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <ul>{% for d in r1.results.deliverables %}<li>{{ loop.index }}. {{ d }}</li>{% endfor %}</ul>
+                {% endif %}
+                <div class="section-title">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Risks
+                </div>
+                <ul>{% for r in r1.results.risks %}<li><strong>{{ r.category }} ({{ r.severity }})</strong>: {{ r.description }}</li>{% endfor %}</ul>
+            </div>
+            <div class="col">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {{ r2.get('title') or r2.filename }}
+                </h2>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">{{ r2.filename }}</div>
+                <div class="stat"><span class="label">Words</span><span class="value">{{ r2.word_count }}</span></div>
+                <div class="stat"><span class="label">Deliverables</span><span class="value">{% if r2.results.deliverables and r2.results.deliverables[0] is mapping %}{% set dcount = r2.results.deliverables | length %}{% set ccount = namespace(v=0) %}{% for d in r2.results.deliverables %}{% if d.sub_deliverables is defined %}{% set ccount.v = ccount.v + d.sub_deliverables | length %}{% endif %}{% endfor %}{{ dcount }} / {{ ccount.v }}{% else %}{{ r2.results.deliverables | length }}{% endif %}</span></div>
+                <div class="stat"><span class="label">Risks</span><span class="value">{{ r2.results.risks | length }}</span></div>
+                <div class="section-title">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Deliverables
+                </div>
+                {% if r2.results.deliverables and r2.results.deliverables[0] is mapping %}
+                {% set r2_tc = namespace(v=0) %}{% set r2_rc = namespace(v=0) %}
+                {% for g in r2.results.deliverables %}{% if g.sub_deliverables is defined %}{% for c in g.sub_deliverables %}{% set r2_tc.v = r2_tc.v + 1 %}{% set cr = c.reference if c.reference is defined else c.get('reference', '') %}{% if cr %}{% set r2_rc.v = r2_rc.v + 1 %}{% endif %}{% endfor %}{% endif %}{% endfor %}
+                {% set r2_pct = (r2_rc.v / r2_tc.v * 100) | int if r2_tc.v > 0 else 0 %}
+                <div class="comp-toc">
+                    <div class="comp-toc-stats">
+                        <span><strong>{{ r2.results.deliverables | length }}</strong> groups</span>
+                        <span><strong>{{ r2_tc.v }}</strong> items</span>
+                        <span><strong>{{ r2_pct }}%</strong> refs <span class="comp-toc-bar"><span class="comp-toc-bar-fill" style="width:{{ r2_pct }}%"></span></span></span>
+                    </div>
+                    <div class="comp-toc-anchors">{% for g in r2.results.deliverables %}<a href="#r2-deliv-{{ loop.index }}">{{ loop.index }}. {{ g.deliverable if g.deliverable is defined else g.get('deliverable', '') }}</a>{% endfor %}</div>
+                </div>
+                <div class="comp-search">
+                    <span class="comp-search-icon"><svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none"/></svg></span>
+                    <input type="text" placeholder="Filter deliverables..." oninput="filterCompare(this.value, 'r2')">
+                </div>
+                <ul class="tree-compare" id="r2-tree">
+                    {% for group in r2.results.deliverables %}
+                    {% set pname = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+                    {% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+                    {% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+                    {% set outer_idx = loop.index %}
+                    <li class="tree-compare-parent" id="r2-deliv-{{ outer_idx }}" data-search="{{ pname | lower }} {{ ref | lower }}">
+                        <div class="tree-compare-parent-label" onclick="toggleCompare(this)">
+                            <svg class="toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="parent-accent"></span>
+                            <span>{{ outer_idx }}. {{ pname }}</span>
+                        </div>
+                        {% if ref %}
+                        {% set pg_raw = group.page_number if group.page_number is defined else group.get('page_number', '') %}
+                        {% set rest = ref.split(']') | last %}
+                        {% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+                        {% set parsed_page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+                        {% set page_display = ('p.' + pg_raw|string) if pg_raw else parsed_page %}
+                        {% set desc = rest.split('—') | last if '—' in rest else '' %}
+                        <li class="tree-compare-ref" title="{{ ref }}">
+                            <span class="ref-file">{{ ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ sec | trim }}</span>
+                            {% if page_display %}<span class="ref-page">{{ page_display }}</span>{% endif %}
+                            {% if desc %}<span class="ref-desc">— {{ desc | trim }}</span>{% endif %}
+                        </li>
+                        {% endif %}
+                        {% if children %}
+                        <ul class="tree-compare-children">
+                        {% for child in children %}
+                        {% if child is mapping %}
+                        {% set child_name = child.name if child.name is defined else child.get('name', '') %}
+                        {% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+                        {% else %}
+                        {% set child_name = child %}
+                        {% set child_ref = '' %}
+                        {% endif %}
+                        <li class="tree-compare-child" data-search="{{ pname | lower }} {{ child_name | lower }} {{ child_ref | lower }}">{{ outer_idx }}.{{ loop.index }} {{ child_name }}</li>
+                        {% if child_ref %}
+                        {% set cpg_raw = child.page_number if child.page_number is defined else child.get('page_number', '') %}
+                        {% set crest = child_ref.split(']') | last %}
+                        {% set csec = crest.split('p.')[0] if 'p.' in crest else crest.split('—')[0] %}
+                        {% set cparsed_page = 'p.' + crest.split('p.')[1].split('—')[0] | trim if 'p.' in crest else '' %}
+                        {% set cpage_display = ('p.' + cpg_raw|string) if cpg_raw else cparsed_page %}
+                        {% set cdesc = crest.split('—') | last if '—' in crest else '' %}
+                        <li class="tree-compare-child-ref" title="{{ child_ref }}">
+                            <span class="ref-file">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ csec | trim }}</span>
+                            {% if cpage_display %}<span class="ref-page">{{ cpage_display }}</span>{% endif %}
+                            {% if cdesc %}<span class="ref-desc">— {{ cdesc | trim }}</span>{% endif %}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <ul>{% for d in r2.results.deliverables %}<li>{{ loop.index }}. {{ d }}</li>{% endfor %}</ul>
+                {% endif %}
+                <div class="section-title">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Risks
+                </div>
+                <ul>{% for r in r2.results.risks %}<li><strong>{{ r.category }} ({{ r.severity }})</strong>: {{ r.description }}</li>{% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+    {% set sc1 = r1.results.strategic_checklist if r1.results.strategic_checklist is defined else None %}
+    {% set sc2 = r2.results.strategic_checklist if r2.results.strategic_checklist is defined else None %}
+    {% if sc1 or sc2 %}
+    <div class="container" style="padding-top:0">
+        <div class="section-title" style="font-size:16px;margin-bottom:16px">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Strategic Checklist Comparison
+        </div>
+        <div class="compare-grid">
+            <div class="col">
+                <h2>{{ r1.get('title') or r1.filename }}</h2>
+                {% if sc1 and sc1.executive_summary %}
+                <p style="font-size:13px;color:var(--text-secondary);background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px"><strong>Summary:</strong> {{ sc1.executive_summary }}</p>
+                {% endif %}
+                {% if sc1 %}
+                {% for key in ['financial','legal','operations','technical'] %}
+                {% set items = sc1[key] if sc1[key] is defined else [] %}
+                {% if items %}
+                <div class="section-title" style="text-transform:capitalize">{{ key }}</div>
+                <ul>{% for i in items %}<li><strong>{{ i.item }}</strong> <span style="font-size:11px;color:var(--text-muted)">[{{ i.status }}]</span></li>{% endfor %}</ul>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <p style="color:var(--text-muted);font-size:13px">Not available</p>
+                {% endif %}
+            </div>
+            <div class="col">
+                <h2>{{ r2.get('title') or r2.filename }}</h2>
+                {% if sc2 and sc2.executive_summary %}
+                <p style="font-size:13px;color:var(--text-secondary);background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px"><strong>Summary:</strong> {{ sc2.executive_summary }}</p>
+                {% endif %}
+                {% if sc2 %}
+                {% for key in ['financial','legal','operations','technical'] %}
+                {% set items = sc2[key] if sc2[key] is defined else [] %}
+                {% if items %}
+                <div class="section-title" style="text-transform:capitalize">{{ key }}</div>
+                <ul>{% for i in items %}<li><strong>{{ i.item }}</strong> <span style="font-size:11px;color:var(--text-muted)">[{{ i.status }}]</span></li>{% endfor %}</ul>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <p style="color:var(--text-muted);font-size:13px">Not available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            if (theme === 'dark') {
+                var icon = document.getElementById('themeIcon');
+                if (icon) {
+                    icon.outerHTML = '<svg class="icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                }
+            }
+        })();
+
+        window.toggleCompare = function(label) {
+            var parent = label.closest('.tree-compare-parent');
+            if (!parent) return;
+            parent.classList.toggle('collapsed');
+        };
+
+        window.filterCompare = function(query, prefix) {
+            var q = query.toLowerCase().trim();
+            var tree = document.getElementById(prefix + '-tree');
+            if (!tree) return;
+            tree.querySelectorAll('.tree-compare-parent').forEach(function(parent) {
+                if (!q) {
+                    parent.style.display = '';
+                    parent.querySelectorAll('.tree-compare-child').forEach(function(c) { c.style.display = ''; });
+                    return;
+                }
+                var parentMatch = parent.dataset.search && parent.dataset.search.includes(q);
+                var hasVisibleChild = false;
+                parent.querySelectorAll('.tree-compare-child').forEach(function(child) {
+                    if (child.dataset.search && child.dataset.search.includes(q)) {
+                        child.style.display = '';
+                        hasVisibleChild = true;
+                    } else {
+                        child.style.display = parentMatch ? '' : 'none';
+                    }
+                });
+                if (parentMatch || hasVisibleChild) {
+                    parent.style.display = '';
+                    parent.classList.remove('collapsed');
+                } else {
+                    parent.style.display = 'none';
+                }
+            });
+        };
+    </script>
+    <script>
+        (function() {
+            window.addEventListener('load', function() {
+                var loader = document.getElementById('pageLoader');
+                if (loader) loader.classList.add('hidden');
+            });
+            document.addEventListener('click', function(e) {
+                var a = e.target.closest('a');
+                if (!a) return;
+                var href = a.getAttribute('href');
+                if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+                var loader = document.getElementById('pageLoader');
+                if (loader) { loader.classList.remove('hidden'); }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis History</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        .container { max-width: 900px; margin: 0 auto; padding: 60px 24px 24px; }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+        .header h1 {
+            font-size: 26px; font-weight: 800; color: var(--text);
+        }
+        .header .back { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: all var(--transition); }
+        .header .back:hover { background: var(--primary-light); color: var(--primary); }
+        .header .back:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        .empty-state { text-align: center; padding: 80px 24px; color: var(--text-muted); }
+        .empty-state .big-icon { margin-bottom: 16px; }
+        .empty-state .big-icon .icon { width: 56px; height: 56px; stroke-width: 1.5; color: var(--text-muted); }
+        .empty-state h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+        .empty-state p { font-size: 14px; color: var(--text-muted); }
+        .empty-state a { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 10px 24px; background: var(--gradient); color: #fff; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; font-size: 14px; transition: all var(--transition); }
+        .empty-state a:hover { opacity: 0.92; }
+
+        .record {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px; margin-bottom: 12px;
+            box-shadow: var(--shadow); transition: all var(--transition);
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .record:hover { border-color: var(--border-strong); }
+        .record .info { flex: 1; min-width: 0; }
+        .record .title-line { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        .record .title-line .title-text { cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background var(--transition); }
+        .record .title-line .title-text:hover { background: var(--primary-light); }
+        .record .title-line .title-input { display:none; font-size: 14px; font-weight:600; padding:4px 8px; border:1px solid var(--primary); border-radius:4px; background:var(--surface); color:var(--text); font-family:inherit; width:100%; max-width:320px; outline:none; }
+        .record .title-line .title-input.show { display:inline-block; }
+        .record .title-line .title-text.hide { display:none; }
+        .record .title-line .rename-icon { display:none; width:14px; height:14px; color:var(--text-muted); flex-shrink:0; }
+        .record:hover .title-line .rename-icon { display:block; }
+        .record .filename-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .record .meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .record .deliv-toggle { font-size: 12px; color: var(--primary); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; user-select: none; }
+        .record .deliv-toggle:hover { text-decoration: underline; }
+        .record .deliv-toggle .toggle-icon { width: 14px; height: 14px; transition: transform 0.2s; }
+        .record .deliv-toggle.open .toggle-icon { transform: rotate(180deg); }
+        .record .deliv-tree { display: none; margin-top: 8px; padding: 10px 12px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border); }
+        .record .deliv-tree.show { display: block; }
+        .record .deliv-tree .d-parent { font-size: 12px; font-weight: 600; padding: 3px 0; color: var(--text); }
+        .record .deliv-tree .d-parent-ref { font-size: 10px; padding: 3px 6px; margin: 2px 0 4px 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 5px; display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; font-family: 'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; }
+        .record .deliv-tree .d-parent-ref .ref-file, .record .deliv-tree .d-child-ref .ref-file { display: inline-block; background: var(--primary-light); color: var(--primary); font-weight: 700; padding: 1px 6px; border-radius: 3px; font-size: 9px; }
+        .record .deliv-tree .d-parent-ref .ref-sec, .record .deliv-tree .d-child-ref .ref-sec { display: inline-block; background: var(--green-light); color: var(--green); font-weight: 600; padding: 1px 6px; border-radius: 3px; font-size: 9px; }
+        .record .deliv-tree .d-parent-ref .ref-page, .record .deliv-tree .d-child-ref .ref-page { display: inline-block; background: var(--amber-light); color: var(--amber); font-weight: 600; padding: 1px 6px; border-radius: 3px; font-size: 9px; }
+        .record .deliv-tree .d-parent-ref .ref-desc, .record .deliv-tree .d-child-ref .ref-desc { display: inline-block; color: var(--text-muted); font-size: 9px; padding: 1px 3px; }
+        .record .deliv-tree .d-child { font-size: 11px; padding: 1px 0 1px 16px; color: var(--text-secondary); }
+        .record .deliv-tree .d-child-ref { font-size: 10px; padding: 2px 6px; margin: 1px 0 4px 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 5px; display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; font-family: 'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; }
+        .record .deliv-tree .d-item { font-size: 12px; padding: 2px 0; color: var(--text-secondary); }
+        .record .actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .record .actions a { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; border: 1px solid var(--border); color: var(--text-secondary); transition: all var(--transition); display: inline-flex; align-items: center; gap: 4px; }
+        .record .actions a:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .record .actions a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+        .hist-search { margin-bottom: 20px; position: relative; }
+        .hist-search input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 14px; font-family: inherit; outline: none; transition: all var(--transition); box-sizing: border-box; }
+        .hist-search input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .hist-search input:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .hist-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+        .no-match { text-align: center; padding: 40px; color: var(--text-muted); display: none; font-size: 14px; }
+        .deliv-tree .d-progress { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .deliv-tree .d-progress-bar { width: 60px; height: 5px; background: var(--border); border-radius: 100px; overflow: hidden; display: inline-block; }
+        .deliv-tree .d-progress-fill { height: 100%; border-radius: 100px; background: var(--green); }
+
+        @media (max-width: 640px) {
+            .record { flex-direction: column; align-items: flex-start; }
+            .record .actions { width: 100%; }
+            .record .actions a { flex: 1; text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-loader" id="pageLoader"><div class="loader-spinner"></div></div>
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+            <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs>
+    </svg>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon" id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="container page-enter">
+        <div class="header">
+            <h1 style="display:flex;align-items:center;gap:10px">
+                <svg width="32" height="32" viewBox="0 0 64 64" style="flex-shrink:0">
+                    <rect width="64" height="64" rx="12" fill="var(--primary)"/>
+                    <path d="M20 18h16l8 8v22a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M36 18v8h8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+                    <polyline points="26 34 30 38 40 28" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Analysis History
+            </h1>
+            <a href="/" class="back">
+                <svg class="icon" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="12 19 5 12 12 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Home
+            </a>
+            <a href="/company_profile" class="back">Company Profile</a>
+
+        </div>
+
+        {% if records %}
+        <div class="hist-search">
+            <span class="hist-search-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" fill="none"/></svg></span>
+            <input type="text" id="histSearchInput" placeholder="Search analysis history..." oninput="filterHistory(this.value)">
+        </div>
+        <div class="no-match" id="noMatch">No records match your search.</div>
+            {% for r in records %}
+            <div class="record" data-search="{{ (r.get('title') or r.filename) | lower }} {{ r.filename | lower }}" onclick="location.href='/view/{{ r.id }}'" style="cursor:pointer">
+                <div class="info">
+                    <div class="title-line">
+                        <span class="title-text" id="title-text-{{ r.id }}">{{ r.get('title') or r.filename }}</span>
+                        <svg class="icon rename-icon" onclick="event.stopPropagation();renameStart('{{ r.id }}')" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <input class="title-input" id="title-input-{{ r.id }}" type="text" value="{{ r.get('title') or r.filename }}" onblur="renameSave('{{ r.id }}')" onkeydown="if(event.key==='Enter'){event.preventDefault();renameSave('{{ r.id }}')}" onclick="event.stopPropagation()">
+                    </div>
+                    <div class="filename-sub">{{ r.filename }}</div>
+                    <div class="meta">
+                        <span>{{ r.timestamp[:10] }} at {{ r.timestamp[11:19] }}</span>
+                        <span>{{ r.word_count }} words</span>
+                        <span>{% if r.results and r.results.deliverables %}{% if r.results.deliverables[0] is mapping %}{% set dcount = r.results.deliverables | length %}{% set ccount = namespace(v=0) %}{% for d in r.results.deliverables %}{% if d.sub_deliverables is defined %}{% set ccount.v = ccount.v + d.sub_deliverables | length %}{% endif %}{% endfor %}{{ dcount }} / {{ ccount.v }}{% else %}{{ r.results.deliverables | length }}{% endif %}{% else %}0{% endif %} deliverables</span>
+                        <span>{{ r.results.get('risks', []) | length if r.results else 0 }} risks</span>
+                    </div>
+                    {% if r.results and r.results.sections_analyzed and r.results.sections_analyzed | length < 9 %}
+                    <div class="section-badges" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+                        {% for s in r.results.sections_analyzed %}
+                        {% set slabel = {'summary':'Summary','deliverables':'Deliverables','evaluation':'Evaluation','compliance':'Compliance','risks':'Risks','timeline':'Timeline','requirements':'Key Req.','gonogo':'Go/No-Go','strategic':'Checklist'} %}
+                        <span style="font-size:9px;padding:2px 8px;border-radius:100px;background:var(--primary-light);color:var(--primary);font-weight:600;line-height:1.5">{{ slabel.get(s, s) }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if r.results and r.results.deliverables %}
+                    {% set h_total = namespace(v=0) %}{% set h_ref = namespace(v=0) %}
+                    {% for g in r.results.deliverables %}{% if g.sub_deliverables is defined %}{% for c in g.sub_deliverables %}{% set h_total.v = h_total.v + 1 %}{% if c is mapping %}{% set cr = c.reference if c.reference is defined else c.get('reference', '') %}{% else %}{% set cr = '' %}{% endif %}{% if cr %}{% set h_ref.v = h_ref.v + 1 %}{% endif %}{% endfor %}{% endif %}{% endfor %}
+                    {% set h_pct = (h_ref.v / h_total.v * 100) | int if h_total.v > 0 else 0 %}
+                    <div class="deliv-toggle" onclick="event.stopPropagation();this.classList.toggle('open');this.nextElementSibling.classList.toggle('show')">
+                        <svg class="toggle-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Show deliverables
+                    </div>
+                    <div class="deliv-tree">
+                    <div class="d-progress"><strong>{{ h_pct }}%</strong> have references <span class="d-progress-bar"><span class="d-progress-fill" style="width:{{ h_pct }}%"></span></span></div>
+                    {% if r.results.deliverables[0] is mapping %}
+                        {% for group in r.results.deliverables %}
+                        {% set pname = group.deliverable if group.deliverable is defined else group.get('deliverable', '') %}
+                        {% set children = group.sub_deliverables if group.sub_deliverables is defined else group.get('sub_deliverables', []) %}
+                        {% set ref = group.reference if group.reference is defined else group.get('reference', '') %}
+                        {% set outer_idx = loop.index %}
+                        <div class="d-parent">{{ outer_idx }}. {{ pname }}</div>
+                        {% if ref %}<div class="d-parent-ref" title="{{ ref }}">
+                            {% set pg_raw = group.page_number if group.page_number is defined else group.get('page_number', '') %}
+                            {% set rest = ref.split(']') | last %}
+                            {% set sec = rest.split('p.')[0] if 'p.' in rest else rest.split('—')[0] %}
+                            {% set parsed_page = 'p.' + rest.split('p.')[1].split('—')[0] | trim if 'p.' in rest else '' %}
+                            {% set page_display = ('p.' + pg_raw|string) if pg_raw else parsed_page %}
+                            {% set desc = rest.split('—') | last if '—' in rest else '' %}
+                            <span class="ref-file">{{ ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ sec | trim }}</span>
+                            {% if page_display %}<span class="ref-page">{{ page_display }}</span>{% endif %}
+                            {% if desc %}<span class="ref-desc">— {{ desc | trim }}</span>{% endif %}
+                        </div>{% endif %}
+                        {% if children %}
+                        {% for child in children %}
+                        {% if child is mapping %}
+                        {% set child_name = child.name if child.name is defined else child.get('name', '') %}
+                        {% set child_ref = child.reference if child.reference is defined else child.get('reference', '') %}
+                        {% else %}
+                        {% set child_name = child %}
+                        {% set child_ref = '' %}
+                        {% endif %}
+                        <div class="d-child">{{ outer_idx }}.{{ loop.index }} {{ child_name }}</div>
+                        {% if child_ref %}<div class="d-child-ref" title="{{ child_ref }}">
+                            {% set cpg_raw = child.page_number if child.page_number is defined else child.get('page_number', '') %}
+                            {% set crest = child_ref.split(']') | last %}
+                            {% set csec = crest.split('p.')[0] if 'p.' in crest else crest.split('—')[0] %}
+                            {% set cparsed_page = 'p.' + crest.split('p.')[1].split('—')[0] | trim if 'p.' in crest else '' %}
+                            {% set cpage_display = ('p.' + cpg_raw|string) if cpg_raw else cparsed_page %}
+                            {% set cdesc = crest.split('—') | last if '—' in crest else '' %}
+                            <span class="ref-file">{{ child_ref.split(']')[0] | replace('[','') }}</span>
+                            <span class="ref-sec">{{ csec | trim }}</span>
+                            {% if cpage_display %}<span class="ref-page">{{ cpage_display }}</span>{% endif %}
+                            {% if cdesc %}<span class="ref-desc">— {{ cdesc | trim }}</span>{% endif %}
+                        </div>{% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for item in r.results.deliverables %}
+                        <div class="d-item">{{ loop.index }}. {{ item }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="actions" onclick="event.stopPropagation()">
+                    <a href="/view/{{ r.id }}">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        View
+                    </a>
+                    <a href="/">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        New
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="big-icon">
+                    <svg class="icon icon-2xl" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h2>No analysis history yet</h2>
+                <p>Upload an RFP document to get started.</p>
+                <a href="/">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Upload Document
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        (function() {
+            var html = document.documentElement;
+            var theme = html.getAttribute('data-theme') || 'light';
+            if (theme === 'dark') {
+                var icon = document.getElementById('themeIcon');
+                if (icon) {
+                    icon.outerHTML = '<svg class="icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                }
+            }
+
+            window.renameStart = function(id) {
+                var text = document.getElementById('title-text-' + id);
+                var input = document.getElementById('title-input-' + id);
+                text.style.display = 'none';
+                input.classList.add('show');
+                input.focus();
+                input.select();
+            };
+            window.renameSave = function(id) {
+                var text = document.getElementById('title-text-' + id);
+                var input = document.getElementById('title-input-' + id);
+                var val = input.value.trim();
+                if (!val) { input.classList.remove('show'); text.style.display = ''; return; }
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/rename', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 204) {
+                        text.textContent = val;
+                    }
+                    input.classList.remove('show');
+                    text.style.display = '';
+                };
+                xhr.onerror = function() {
+                    input.classList.remove('show');
+                    text.style.display = '';
+                };
+                xhr.send('record_id=' + encodeURIComponent(id) + '&title=' + encodeURIComponent(val));
+            };
+        })();
+
+        window.filterHistory = function(query) {
+            var q = query.toLowerCase().trim();
+            var anyVisible = false;
+            document.querySelectorAll('.record').forEach(function(rec) {
+                var match = !q || (rec.dataset.search && rec.dataset.search.includes(q));
+                rec.style.display = match ? '' : 'none';
+                if (match) anyVisible = true;
+            });
+            document.getElementById('noMatch').style.display = anyVisible ? 'none' : 'block';
+        };
+    </script>
+    <script>
+        window.addEventListener('load', function() {
+            var loader = document.getElementById('pageLoader');
+            if (loader) loader.classList.add('hidden');
+        });
+        document.addEventListener('click', function(e) {
+            var a = e.target.closest('a');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+            var loader = document.getElementById('pageLoader');
+            if (loader) { loader.classList.remove('hidden'); }
+        });
+    </script>
+</body>
+</html>

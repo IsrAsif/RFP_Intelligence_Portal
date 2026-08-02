@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Shred — {{ title }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/logo-icon.svg">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <style>
+        body { background: var(--bg); margin: 0; font-family: system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left h1 { font-size: 16px; font-weight: 700; color: var(--text); margin: 0; }
+        .header-left .sub { font-size: 12px; color: var(--text-muted); }
+        .header-left .sub span { margin-right: 12px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .header-actions a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: var(--radius-sm); transition: all var(--transition); }
+        .header-actions a:hover { background: var(--primary-light); color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; background: var(--primary-light); color: var(--primary); }
+        .main { flex: 1; max-width: 1100px; margin: 0 auto; width: 100%; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+        .card h3 { font-size: 15px; font-weight: 600; margin: 0 0 16px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+        .btn { padding: 10px 20px; background: var(--gradient); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity var(--transition); font-family: inherit; }
+        .btn:hover { opacity: 0.92; }
+        .btn:disabled { opacity: 0.5; cursor: default; }
+        .btn-ghost { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
+        .btn-ghost:hover { background: var(--primary-light); }
+        .status-pill { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; background: var(--primary-light); color: var(--primary); margin-left: 8px; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.15); border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -2px; margin-right: 6px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .stats { display: flex; gap: 16px; flex-wrap: wrap; margin: 0 0 14px; font-size: 13px; color: var(--text-secondary); }
+        .stats strong { color: var(--text); }
+        .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+        .dot.green { background: var(--green); }
+        .dot.red { background: var(--red); }
+        .analog-line { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+        .analog-line strong { color: var(--text-secondary); }
+        .req-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .req-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+        .req-table th { text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg); border-bottom: 1px solid var(--border); }
+        .req-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+        .req-table tr:last-child td { border-bottom: none; }
+        .req-id { font-weight: 600; color: var(--primary); white-space: nowrap; }
+        .req-page { text-align: center; white-space: nowrap; }
+        .sc-badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .sc-badge.go { background: var(--green); color: #fff; }
+        .sc-badge.no-go { background: var(--red); color: #fff; }
+        .empty-hint { font-size: 13px; color: var(--text-muted); }
+        .empty-state { padding: 24px; text-align: center; font-size: 13px; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 8px; }
+        .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 8px; }
+        .cl-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+        .cl-item .cl-cat { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .cl-item .cl-text { font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+        .cl-item .cl-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <svg class="icon" viewBox="0 0 24 24" style="color:var(--amber)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+                <h1>Compliance Shred / Section L-M Crosswalk</h1>
+                <div class="sub">
+                    <span>{{ title }}</span>
+                    <span class="badge">{{ provider }}</span>
+                    <span>{{ filename }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="/view/{{ record_id }}">Results</a>
+            <a href="/sentinel/{{ record_id }}">Sentinel</a>
+            <a href="/module4/{{ record_id }}">Smart Reuse</a>
+            <a href="/history">History</a>
+            <a href="/">Home</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="card" style="border-left:3px solid var(--amber)">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;color:var(--amber)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="2" fill="none"/><line x1="8" y1="17" x2="13" y2="17" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                Crosswalk Matrix
+                <span class="status-pill" id="m5Status">
+                    {% if clause_count %}{{ clause_count }} clauses{% elif m5.get('note') %}no L/M section{% else %}not run{% endif %}
+                </span>
+            </h3>
+            <p class="empty-hint">Maps every shall/must/will clause in the RFP's Instructions (Section L) and Evaluation (Section M) sections to the proposal-draft section that answers it. Clauses are embedded and cosine-matched against the fixed proposal outline (threshold {{ m5.get('threshold', '') or '' }}).</p>
+            <div style="display:flex;gap:8px;margin:12px 0 16px;align-items:center">
+                <button class="btn" id="m5Btn" onclick="runCrosswalk()">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;vertical-align:-2px;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Run Crosswalk
+                </button>
+                <span class="empty-hint" id="m5RunHint"></span>
+            </div>
+            {% if m5.get('note') %}
+            <div class="empty-state">{{ m5.get('note', '') }}</div>
+            {% elif m5.get('clauses') %}
+            <div class="stats">
+                <span><strong>{{ clause_count }}</strong> clauses</span>
+                <span><span class="dot green"></span><strong class="go" style="color:var(--green)">{{ mapped }} mapped</strong></span>
+                <span><span class="dot red"></span><strong style="color:var(--red)">{{ unmapped }} unmapped</strong></span>
+                <span style="margin-left:auto">threshold: {{ m5.get('threshold', '') }}</span>
+            </div>
+            {% if m5.get('source_sections') %}
+            <div>
+                {% if m5['source_sections'].get('L') %}<div class="analog-line">L analog: <strong>{{ m5['source_sections']['L'] }}</strong></div>{% endif %}
+                {% if m5['source_sections'].get('M') %}<div class="analog-line">M analog: <strong>{{ m5['source_sections']['M'] }}</strong></div>{% endif %}
+            </div>
+            {% endif %}
+            <div class="req-table-wrap">
+                <table class="req-table">
+                    <thead>
+                        <tr>
+                            <th>Clause ID</th>
+                            <th>RFP Section</th>
+                            <th>Clause Text</th>
+                            <th>Page</th>
+                            <th>Answered In</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in m5.get('clauses', []) %}
+                        <tr>
+                            <td class="req-id">{{ c.get('clause_id', '') }}</td>
+                            <td>{{ c.get('rfp_section_ref', '') }}</td>
+                            <td>{{ c.get('text', '') }}</td>
+                            <td class="req-page">{{ c.get('page_num', '') or '—' }}</td>
+                            <td>
+                                {% if c.get('status') == 'Mapped' %}
+                                <span class="sc-badge go">{{ c.get('draft_section', '') }}</span>
+                                {% else %}
+                                <span class="sc-badge no-go" title="Clause has no matching proposal-draft section">Unmapped — gap</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ '%.3f' | format(c.get('similarity_score', 0)) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">Run the crosswalk to map Section L/M clauses to proposal-draft sections.</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>
+                <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;color:var(--primary)"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Strategic Checklist — Answered In
+                <span class="status-pill" id="clStatus">{{ checklist_items | length }} items</span>
+            </h3>
+            <p class="empty-hint">Each 37-item strategic checklist point is mapped to the proposal-draft section that answers it — the same Answered In field shown in the Results page Checklist tab.</p>
+            {% if checklist_items %}
+            <div class="checklist-grid">
+                {% for it in checklist_items %}
+                <div class="cl-item">
+                    <div class="cl-cat">{{ it.category }}</div>
+                    <div class="cl-text">{{ it.item }}</div>
+                    <div class="cl-meta">
+                        {% if it.status == 'Mapped' %}
+                        <span class="sc-badge go">{{ it.draft_section }}</span>
+                        {% else %}
+                        <span class="sc-badge no-go" title="No matching proposal-draft section">Unmapped — gap</span>
+                        {% endif %}
+                        <span>score {{ '%.3f' | format(it.similarity) }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">Run the crosswalk to map strategic-checklist items to proposal-draft sections.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script>
+        var caseId = '{{ record_id }}';
+        var m5Btn = document.getElementById('m5Btn');
+        var m5Status = document.getElementById('m5Status');
+        var m5RunHint = document.getElementById('m5RunHint');
+
+        function runCrosswalk() {
+            m5Btn.disabled = true;
+            m5RunHint.textContent = 'Isolating sections, confirming clauses via Groq, embedding & mapping...';
+            m5Status.textContent = 'running...';
+            fetch('/module5/crosswalk/' + caseId, { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.error) { m5Status.textContent = 'error'; m5RunHint.textContent = data.error; m5Btn.disabled = false; return; }
+                    m5Status.textContent = (data.clause_count || 0) + ' clauses';
+                    m5RunHint.textContent = data.note ? data.note : (data.mapped + ' mapped / ' + data.unmapped + ' unmapped');
+                    setTimeout(function() { location.reload(); }, 900);
+                })
+                .catch(function(err) {
+                    m5Status.textContent = 'error';
+                    m5RunHint.textContent = 'Failed: ' + err.message;
+                    m5Btn.disabled = false;
+                });
+        }
+    </script>
+</body>
+</html>
