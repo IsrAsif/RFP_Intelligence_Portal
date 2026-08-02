@@ -3397,17 +3397,18 @@ def _sentinel_get_notes(case_id: str) -> list:
 
 _SENTINEL_REHEARSAL_PROMPT = """\
 You are a skeptical procurement evaluator reviewing an RFP response. \
-Your role is to pressure-test the bid by raising ONLY objections that are \
-grounded in the case's actual Module 2 verification findings listed below. \
-Do NOT invent new compliance problems that Module 2 did not already flag.
+Your role is to pressure-test the bid by raising objections that are \
+grounded in the case's objection context listed below. Do NOT invent \
+new compliance problems that are not grounded in this context.
 
-Module 2 Non-Go findings for this case:
-{non_go_items}
+Objection context for this case:
+{objection_context}
 
 Rules:
-- Base your objections EXCLUSIVELY on the Non-Go items listed above.
-- For each objection, cite the specific req_id, the status, and the stated \
-reasoning from Module 2.
+- Base your objections on the items listed above (Module 2 non-Go findings, \
+case risks, High-risk checklist items, and lowest-weighted evaluation factors).
+- For each objection, cite the specific req_id / risk / checklist item / \
+evaluation factor and its stated status, risk level, or reasoning.
 - Do NOT invent requirements, risks, or compliance gaps not listed.
 - If the user asks you to take an action (reassign, mark_reviewed, draft_email, \
 etc.), explain that Rehearsal Mode is read-only and cannot perform actions.
@@ -3637,8 +3638,83 @@ def _sentinel_check_partner_matches(case_id: str, case: dict) -> list[dict]:
 
 
 # --- Rehearsal Mode handler ---
-
 _NON_GO_STATUSES = frozenset({'No-Go', 'Escalate', 'Caution'})
+
+_POINTS_RE = re.compile(r'\((\d+)\s*points\)', re.IGNORECASE)
+
+
+def _sentinel_rehearsal_fallback_sources(case: dict) -> list:
+    """Ground objections in the case itself when Module 2 has no non-Go findings.
+
+    Sources: explicit risks, High-risk strategic checklist items, and the
+    lowest-weighted evaluation criteria (most likely scrutiny areas).
+    """
+    items = []
+
+    for i, risk in enumerate(case.get('risks', [])):
+        if isinstance(risk, dict):
+            cat = (risk.get('category') or '').strip()
+            desc = (risk.get('description') or '').strip()
+            sev = (risk.get('severity') or '').strip()
+        else:
+            cat, desc, sev = '', str(risk).strip(), ''
+        if desc:
+            label = f"[risk {i + 1}]"
+            if cat:
+                label += f" ({cat})"
+            if sev:
+                label += f" severity={sev}"
+            items.append(f"- {label}: {desc}")
+
+    sc = case.get('strategic_checklist', {})
+    for cat in ('financial', 'legal', 'operations', 'technical'):
+        for ii, item in enumerate(sc.get(cat, [])):
+            if str(item.get('risk_level', '')).strip().lower() == 'high':
+                name = (item.get('item') or '').strip()
+                reasoning = (item.get('reasoning') or '').strip()
+                if name:
+                    text = f"- [checklist.{cat}[{ii}]] {name}"
+                    if reasoning:
+                        text += f" | reasoning: {reasoning}"
+                    items.append(text)
+
+    parsed = []
+    for ec in case.get('evaluation_criteria', []):
+        if isinstance(ec, dict):
+            name = (ec.get('criteria') or ec.get('factor') or ec.get('name') or '').strip()
+            pts = ec.get('points')
+            try:
+                pts = int(pts)
+            except (TypeError, ValueError):
+                pts = None
+            if pts is None and name:
+                m = _POINTS_RE.search(name)
+                if m:
+                    pts = int(m.group(1))
+        else:
+            name = str(ec).strip()
+            pts = None
+            if name:
+                m = _POINTS_RE.search(name)
+                if m:
+                    pts = int(m.group(1))
+        parsed.append((name, pts))
+
+    lowest = sorted({pts for _, pts in parsed if pts is not None})[:2]
+    for name, pts in parsed:
+        if name and pts is not None and pts in lowest:
+            pts_txt = f" ({pts} points)"
+            if f"({pts} points" not in name:
+                name = name + pts_txt
+            items.append(f"- [evaluation criteria] {name} — lowest-weighted evaluation factor; likely scrutiny area")
+
+    seen, out = set(), []
+    for it in items:
+        if it not in seen:
+            seen.add(it)
+            out.append(it)
+    return out
+
 
 def _sentinel_build_rehearsal_context(case: dict) -> str | None:
     items = []
@@ -3650,6 +3726,13 @@ def _sentinel_build_rehearsal_context(case: dict) -> str | None:
     for req_id, v in checklist_verif.items():
         if v.get('status') in _NON_GO_STATUSES:
             items.append(f"- {req_id}: status={v.get('status','')}, risk_level={v.get('risk_level','')}, reasoning={v.get('reasoning','')}")
+
+    # No Module 2 non-Go findings: rehearse against the case's own risks,
+    # High-risk checklist items, and weakest evaluation factors instead of
+    # returning a dead-end "no objections" message.
+    if not items:
+        items = _sentinel_rehearsal_fallback_sources(case)
+
     if not items:
         return None
     return "\n".join(items)
@@ -3668,7 +3751,7 @@ def _sentinel_rehearse(question: str, case: dict) -> dict:
             "answer": "Groq API key not configured. Cannot run rehearsal mode.",
             "cited_items": [], "confidence": "low",
         }
-    prompt = _SENTINEL_REHEARSAL_PROMPT.format(non_go_items=context)
+    prompt = _SENTINEL_REHEARSAL_PROMPT.format(objection_context=context)
     client = groq.Groq(api_key=api_key)
     case_json_str = json.dumps(case, indent=2, default=str)
     if len(case_json_str) > 10000:
