@@ -258,9 +258,9 @@ The browser client renders templates server-side (Jinja2) with minimal client-si
 
 3. **Export Flow:**
    - User clicks Export (PDF or JSON) on the results page.
-   - The `results_data` hidden input contains the full analysis as a JSON string.
-   - For PDF: Flask renders the `report_template.html` with xhtml2pdf-compatible markup, converts to PDF bytes, and returns as a download with cache-busting headers.
-   - For JSON: Flask returns the JSON string as a downloadable file.
+   - The `results_data` hidden input contains the full analysis as a JSON string; for amendment records a `delta_data` hidden input carries the stored amendment delta.
+   - For PDF: Flask renders the `report_template.html` with xhtml2pdf-compatible markup, converts to PDF bytes, and returns as a download with cache-busting headers. The report includes the analysis sections, extracted requirements with Module 2 verification, checklist verification, the full Compliance Shred (Module 5) content, and the amendment delta when present.
+   - For JSON: Flask returns the JSON string as a downloadable file, embedding the amendment `delta` for amendment records.
 
 ---
 
@@ -430,7 +430,7 @@ The strategic checklist is a fixed 37-item evaluation derived from a business-sp
 
 **FR-027**: The system SHALL provide PDF export using xhtml2pdf 0.2.17. The PDF template SHALL use table-based layout only (no SVG, no flexbox, no CSS `@page` margin-box rules).  
 **Priority**: High  
-**FR-028**: The PDF export SHALL include all analysis sections: summary, go/nogo, deliverables, evaluation criteria, risks, timeline, key requirements, compliance (4-column matrix), and checklist (status summary bar + 7-field detail table).  
+**FR-028**: The PDF export SHALL include all analysis sections: summary, go/nogo, deliverables, evaluation criteria, risks, timeline, key requirements, compliance (4-column matrix), checklist (status summary bar + 7-field detail table), extracted requirements with Module 2 verification (status/risk/reasoning per requirement), checklist verification, and the full Compliance Shred (Module 5) content (clause-to-outline crosswalk + strategic-checklist "Answered In" mapping). For amendment records the PDF SHALL also include the amendment delta (baseline, high/low counts, change list, summary).  
 **Priority**: High  
 **FR-029**: PDF and JSON export filenames SHALL use the format `RFP_Analysis_<sanitized_title>_<timestamp>.pdf` and `RFP_Analysis_<sanitized_title>.json` respectively.  
 **Priority**: High  
@@ -729,8 +729,8 @@ AI responses are parsed and normalized through a two-stage pipeline: `parse_resi
 | GET | `/view/<id>` | View specific analysis | `results.html` |
 | POST | `/compare` | Compare two analyses | `compare.html` |
 | POST | `/rename` | Rename analysis | (204 No Content) |
-| POST | `/export_pdf` | Download PDF export | `report_template.html` |
-| POST | `/export_json` | Download JSON export | (raw JSON) |
+| POST | `/export_pdf` | Download PDF export (analysis + verification + compliance shred + amendment delta) | `report_template.html` |
+| POST | `/export_json` | Download JSON export (embeds amendment `delta` when present) | (raw JSON) |
 
 ---
 

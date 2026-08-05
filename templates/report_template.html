@@ -243,6 +243,71 @@ th{background:#f5f5f5;padding:4px 5px;font-size:8pt;font-weight:700;text-align:l
 {% else %}<tr><td colspan="4" class="note">No checklist verification performed.</td></tr>{% endif %}
 </table>
 
+<h2 style="page-break-before:always">Compliance Shred — Clause-to-Outline Crosswalk</h2>
+{% set m5 = results.module5_crosswalk if results.module5_crosswalk is defined else None %}
+{% if m5 and m5.clauses is defined and m5.clauses %}
+{% set m5mapped = m5.clauses | selectattr('status', 'equalto', 'Mapped') | list | length %}
+<div class="meta">
+{{ m5.clauses | length }} clauses · {{ m5mapped }} mapped / {{ m5.clauses | length - m5mapped }} unmapped · threshold {{ m5.get('threshold', '') }}
+{% if m5.get('source_sections') and m5['source_sections'].get('L') %} · L: {{ m5['source_sections']['L'] }}{% endif %}
+{% if m5.get('source_sections') and m5['source_sections'].get('M') %} · M: {{ m5['source_sections']['M'] }}{% endif %}
+</div>
+<table>
+<tr><th style="width:10%">Clause ID</th><th style="width:12%">RFP Section</th><th style="width:6%">Page</th><th style="width:16%">Answered In</th><th style="width:8%">Score</th><th style="width:48%">Clause Text</th></tr>
+{% for c in m5.clauses %}
+<tr>
+<td style="font-weight:700">{{ c.get('clause_id', '') }}</td>
+<td>{{ c.get('rfp_section_ref', '') }}</td>
+<td>{{ c.get('page_num', '') or '—' }}</td>
+{% if c.get('status') == 'Mapped' %}
+<td><span class="sgo" style="font-weight:700;font-size:7pt">{{ c.get('draft_section', '') }}</span></td>
+{% else %}
+<td><span class="snogo" style="font-weight:700;font-size:7pt">Unmapped — gap</span></td>
+{% endif %}
+<td>{{ '%.3f' | format(c.get('similarity_score', 0)) }}</td>
+<td>{{ c.get('text', '') }}</td>
+</tr>
+{% endfor %}
+</table>
+{% elif m5 and m5.get('note') %}
+<div class="note">{{ m5.get('note') }}</div>
+{% else %}
+<div class="note">No compliance-shred crosswalk available for this analysis.</div>
+{% endif %}
+
+<h2 style="page-break-before:always">Strategic Checklist — Answered In</h2>
+{% set sc5 = results.strategic_checklist if results.strategic_checklist is defined else None %}
+{% if sc5 %}
+{% set cat_labels = {'financial': 'FINANCIAL / ACCOUNTING CHECKLIST', 'legal': 'LEGAL CHECKLIST', 'operations': 'OPERATIONS CHECKLIST', 'technical': 'TECHNICAL CHECKLIST'} %}
+{% set m5_items = [] %}
+{% for cat in ('financial', 'legal', 'operations', 'technical') %}
+{% set items = sc5.get(cat, []) %}
+{% if items %}
+<h3 style="font-size:10pt;color:#4f46e5;font-weight:700;margin:10px 0 3px 0">{{ cat_labels[cat] }}</h3>
+<table>
+<tr><th style="width:55%">Checklist Item</th><th style="width:25%">Answered In</th><th style="width:8%">Score</th><th style="width:12%">Status</th></tr>
+{% for it in items %}
+{% if it is mapping and it.get('item') %}
+{% set m5st = it.module5_status if it.module5_status is defined else '' %}
+<tr>
+<td style="font-weight:700">{{ it.get('item', '') }}</td>
+{% if m5st == 'Mapped' %}
+<td><span class="sgo" style="font-weight:700;font-size:7pt">{{ it.module5_draft_section if it.module5_draft_section is defined else '' }}</span></td>
+{% else %}
+<td><span class="snogo" style="font-weight:700;font-size:7pt">Unmapped — gap</span></td>
+{% endif %}
+<td>{{ '%.3f' | format(it.module5_similarity if it.module5_similarity is defined else 0) }}</td>
+<td>{{ m5st if m5st else 'Unmapped' }}</td>
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+{% endif %}
+{% endfor %}
+{% else %}
+<div class="note">Strategic checklist not available for this analysis.</div>
+{% endif %}
+
 {% if delta and delta.get('changes') is defined %}
 <div style="page-break-before:always">
 <h2>Amendment Delta — Changes vs Baseline</h2>

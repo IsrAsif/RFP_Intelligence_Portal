@@ -40,7 +40,7 @@ AI-powered RFP (Request for Proposal) analysis platform that ingests solicitatio
 | **Compliance Shred** | Maps Section L–M clauses / checklist items onto your proposal outline (BM25 + embeddings) |
 | **Amendments** | Tag an upload as an amendment of a prior case; structural diff, severity, Groq summary, Version History UI |
 | **Persistence** | All analyses stored in SQLite — real history, compare, view, rename, export |
-| **Export** | Full PDF report, deliverables-only PDF, requirements Excel, raw JSON |
+| **Export** | Full PDF report (complete analysis + requirements verification + compliance-shred crosswalk + amendment delta), deliverables-only PDF, requirements Excel, raw JSON (with delta for amendments) |
 
 ---
 
@@ -52,6 +52,8 @@ AI-powered RFP (Request for Proposal) analysis platform that ingests solicitatio
 - **Results** — Executive summary + 10 tabs (see overview). Every analysis is persisted to SQLite with a deterministic content hash, word count, provider, and timestamp.
 - **Export toolbar** — Results page header has a professional toolbar:
   - **Export dropdown** → Documents: *Full PDF report*, *Deliverables-only PDF*; Data: *Requirements (Excel)*, *Raw JSON*
+  - The **Full PDF report** is the complete deliverable: summary, deliverables, evaluation criteria, risks, timeline, key requirements, compliance matrix, 37-item checklist, **extracted requirements with Module 2 verification**, **checklist verification**, the full **Compliance Shred (Module 5)** content (clause-to-outline crosswalk *and* the strategic-checklist "Answered In" mapping), and — for amendment records — the **amendment delta**.
+  - **Raw JSON** embeds the amendment `delta` for amendment records too, so every export is complete.
   - **Tools group** → *Extract* (re-run requirements extraction), *Requirements* (view/filter/export requirements), *Smart Reuse*, *Compliance Shred*, and **Sentinel** as the primary action
 - **Analyzing Overlay** — Full-screen animated overlay with step-by-step progress during processing.
 - **Error handling** — If analysis fails (provider outage, empty/truncated model output), uploads return a styled 502 error page instead of a silent partial result.
@@ -107,7 +109,7 @@ AI-powered RFP (Request for Proposal) analysis platform that ingests solicitatio
   3. Isolate L/M clauses
   4. Embed each clause (Cloudflare `bge-base-en-v1.5`)
   5. Map to outline sections with hybrid scoring: **0.5 × BM25 + 0.5 × cosine**, using a lexical-stopword pass (`_m5_lexical_clean`) so procedural words ("contract", "bidder") don't dominate; falls back to cosine-only when text is missing
-- **Output** — Crosswalk table with per-clause best-matching outline section, similarity score, and pass/fail against a threshold; persisted into the case's `results.module5_crosswalk`.
+- **Output** — Crosswalk table with per-clause best-matching outline section, similarity score, and pass/fail against a threshold, plus a **Strategic Checklist — Answered In** mapping for every checklist item (37 items). Clauses persist into the case's `results.module5_crosswalk`; checklist mappings persist as `module5_*` fields on each checklist item. **Both parts are included in the full PDF export.**
 
 ---
 
@@ -118,7 +120,7 @@ AI-powered RFP (Request for Proposal) analysis platform that ingests solicitatio
 - **Baseline selection** — `_m6_find_baseline` picks the most recent prior analysis in the case group (root + its amendments).
 - **Structural diff** (`_m6_diff`) — Compares baseline vs. new analysis across `timeline`, `requirements`, `deliverables` (including sub-deliverable names), `risks`, `evaluation_criteria`, `compliance`, `strategic_checklist` (per category), `go_nogo` (score/verdict/reasons), and `module2_verification`. Items are matched by normalized fingerprints; each change is classified as **Added / Removed / Modified** with severity **High / Low** (High = material change such as a date, number, name, or requirement text shift).
 - **AI summary** — `_m6_generate_summary` condenses High-severity changes into 1–3 sentences via Module 4's Groq account (`llama-3.3-70b-versatile`, `response_format=json_object`); a local rule-based fallback sentence is used if Groq is unavailable. Usage token stats are stored in the delta.
-- **Delta record** — Stored in `analyses.delta` JSON: `baseline_id`, `baseline_title`, `baseline_timestamp`, counts, change list, `summary`, `usage`.
+- **Delta record** — Stored in `analyses.delta` JSON: `baseline_id`, `baseline_title`, `baseline_timestamp`, counts, change list, `summary`, `usage`. The delta is included in the amendment's **PDF and JSON exports** so the export tells the full baseline → delta → amendment story.
 - **UI** —
   - **Amendment Delta banner** on the amendment's results page (vs. baseline title, high/low chips, compare link).
   - **Version History card** on *every* results page of a case group (baseline and amendments): lists all versions newest-first with Baseline/Amendment badges, provider, timestamp, high/low delta counts, and (for amendments) a truncated delta summary; each row links to `/view/<id>` and the currently-viewed record is highlighted.
@@ -302,7 +304,7 @@ CLOUDFLARE_VERIFICATION_MODEL=@cf/meta/llama-3.1-8b-instruct
 | `/api/module4/library/...` | POST/GET/DELETE | Answer library (ingest, suggest, apply, draft, save-adapted, delete) |
 | `/module5/<record_id>` | GET | Compliance Shred / Section L–M crosswalk UI |
 | `/module5/crosswalk/<id>` | GET | Run and persist the crosswalk |
-| `/api/analysis/<id>/export.*` | GET | JSON / PDF / XLSX download endpoints |
+| `/api/analysis/<id>/export.*` | GET | JSON / PDF / XLSX download endpoints — PDF includes requirements verification + full Compliance Shred; JSON includes the amendment `delta` |
 
 ### Typical workflow
 
@@ -310,7 +312,7 @@ CLOUDFLARE_VERIFICATION_MODEL=@cf/meta/llama-3.1-8b-instruct
 2. Watch the analyzing overlay; review the 10-tab results.
 3. Use **Extract** to re-run requirements, then **Verify** against your company profile.
 4. Open **Sentinel** to ask questions; use **Smart Reuse** to build reusable answers; run **Compliance Shred** to map L/M clauses to your outline.
-5. Export the full PDF report, deliverables-only PDF, requirements Excel, or raw JSON.
+5. Export the full PDF report (complete analysis + requirements verification + compliance-shred crosswalk + amendment delta), deliverables-only PDF, requirements Excel, or raw JSON.
 6. For amendments, check the **Amendment Delta** banner and the **Version History** card to see exactly what changed.
 7. Compare any two records at `/compare`.
 
