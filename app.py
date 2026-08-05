@@ -1824,6 +1824,19 @@ def _load_results(json_str: str) -> dict:
     return {}
 
 
+def _parse_export_delta(raw: str) -> dict:
+    """Parse the hidden delta_data form field for exports. Tolerates null/empty/malformed."""
+    if not raw or not str(raw).strip():
+        return {}
+    try:
+        data = parse_resilient_json(raw)
+    except Exception:
+        return {}
+    if isinstance(data, dict) and data.get('changes'):
+        return data
+    return {}
+
+
 def _build_prompt(selected_keys: list[str]) -> str:
     keys_str = ', '.join(selected_keys)
     lines = [
@@ -2340,8 +2353,9 @@ def export_pdf():
     results_raw = request.form.get('results_data', '{}')
     filename = request.form.get('filename', 'document')
     results_dict = _load_results(results_raw)
+    delta = _parse_export_delta(request.form.get('delta_data', ''))
 
-    html = render_template('report_template.html', results=results_dict, filename=filename)
+    html = render_template('report_template.html', results=results_dict, filename=filename, delta=delta)
     buf = io.BytesIO()
     status = pisa.CreatePDF(html, dest=buf)
     if getattr(status, 'err', False):
@@ -2392,6 +2406,9 @@ def export_json():
     results_raw = request.form.get('results_data', '{}')
     filename = request.form.get('filename', 'document')
     results_dict = _load_results(results_raw)
+    delta = _parse_export_delta(request.form.get('delta_data', ''))
+    if delta:
+        results_dict['delta'] = delta
 
     safe_name = re.sub(r'[^\w\s-]', '', filename).strip().replace(' ', '_') or 'analysis'
     clean_name = f"RFP_Analysis_{safe_name}.json"
@@ -2406,11 +2423,16 @@ def export_json():
 def api_export_json(analysis_id):
     db = get_db()
     row = db.execute(
-        'SELECT results FROM analyses WHERE id = ?', (analysis_id,)
+        'SELECT results, delta FROM analyses WHERE id = ?', (analysis_id,)
     ).fetchone()
     if not row:
         return jsonify({'error': 'analysis not found'}), 404
-    return jsonify(_load_results(row['results']))
+    data = _load_results(row['results'])
+    if row['delta']:
+        dlt = _load_results(row['delta'])
+        if dlt and dlt.get('changes'):
+            data['delta'] = dlt
+    return jsonify(data)
 
 # Unauthenticated by design for this demo — do not expose in production without adding
 # access control, since analysis IDs may be guessable and results contain compliance/pricing detail.
@@ -2418,12 +2440,13 @@ def api_export_json(analysis_id):
 def api_export_pdf(analysis_id):
     db = get_db()
     row = db.execute(
-        'SELECT title, filename, results FROM analyses WHERE id = ?', (analysis_id,)
+        'SELECT title, filename, results, delta FROM analyses WHERE id = ?', (analysis_id,)
     ).fetchone()
     if not row:
         return jsonify({'error': 'analysis not found'}), 404
     results_dict = _load_results(row['results'])
-    html = render_template('report_template.html', results=results_dict, filename=row['filename'])
+    delta = _load_results(row['delta']) if row['delta'] else {}
+    html = render_template('report_template.html', results=results_dict, filename=row['filename'], delta=delta)
     buf = io.BytesIO()
     status = pisa.CreatePDF(html, dest=buf)
     if getattr(status, 'err', False):

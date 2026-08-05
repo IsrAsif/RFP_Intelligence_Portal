@@ -206,4 +206,60 @@ th{background:#f5f5f5;padding:4px 5px;font-size:8pt;font-weight:700;text-align:l
 <div class="note">Strategic checklist not available for this analysis.</div>
 {% endif %}
 
+<h2 style="page-break-before:always">Extracted Requirements &amp; Verification</h2>
+<table>
+<tr><th style="width:8%">ID</th><th style="width:12%">Category</th><th style="width:10%">Status</th><th style="width:10%">Risk</th><th style="width:60%">Requirement / Reasoning</th></tr>
+{% if results.requirements is defined and results.requirements %}
+{% for r in results.requirements %}
+{% set rid = r.req_id if r.req_id is defined else (r.get('req_id','')) %}
+{% set v = results.module2_verification.get(rid) if (results.module2_verification is defined and rid and results.module2_verification.get(rid)) else None %}
+<tr>
+<td style="font-weight:700">{{ rid }}</td>
+<td>{{ r.category if r.category is defined else (r.get('category','')) }}</td>
+<td>{{ v.status if v.status is defined else '' }}</td>
+<td>{{ v.risk_level if v.risk_level is defined else '' }}</td>
+<td>
+{{ r.description if r.description is defined else (r.get('description','')) }}
+{% if v is not none and v.reasoning is defined and v.reasoning %}<div class="i">Reasoning: {{ v.reasoning }}</div>{% endif %}
+{% if r.section_ref is defined and r.section_ref %}<div style="font-size:7pt;color:#666">Ref: {{ r.section_ref }}</div>{% endif %}
+</td>
+</tr>
+{% endfor %}
+{% else %}<tr><td colspan="5" class="note">No requirements extracted.</td></tr>{% endif %}
+</table>
+
+<h2>Checklist Verification</h2>
+<table>
+<tr><th style="width:12%">ID</th><th style="width:10%">Status</th><th style="width:12%">Risk</th><th style="width:66%">Reasoning</th></tr>
+{% if results.module2_checklist_verification is defined and results.module2_checklist_verification %}
+{% for rid, v in results.module2_checklist_verification.items() %}
+<tr>
+<td style="font-weight:700">{{ rid }}</td>
+<td>{{ v.status if v.status is defined else '' }}</td>
+<td>{{ v.risk_level if v.risk_level is defined else '' }}</td>
+<td>{{ v.reasoning if v.reasoning is defined else '' }}</td>
+</tr>
+{% endfor %}
+{% else %}<tr><td colspan="4" class="note">No checklist verification performed.</td></tr>{% endif %}
+</table>
+
+{% if delta and delta.get('changes') is defined %}
+<div style="page-break-before:always">
+<h2>Amendment Delta — Changes vs Baseline</h2>
+<div class="meta">Baseline: {{ delta.get('baseline_title', '') if delta.get('baseline_title') else delta.get('baseline_id', '') }} · {{ delta.get('high_count', 0) }} high / {{ delta.get('low_count', 0) }} low changes</div>
+{% if delta.get('summary') %}<div class="sb">{{ delta.get('summary') }}</div>{% endif %}
+<table>
+<tr><th style="width:8%">Type</th><th style="width:8%">Severity</th><th style="width:16%">Section</th><th style="width:68%">Change</th></tr>
+{% for c in delta.get('changes', []) %}
+<tr>
+<td>{{ c.get('change_type', '') }}</td>
+<td>{{ c.get('severity', '') }}</td>
+<td>{{ c.get('section', '') }}</td>
+<td>{{ c.get('detail', '') }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endif %}
+
 </body></html>
