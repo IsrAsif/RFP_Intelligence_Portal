@@ -45,5 +45,39 @@
       }
     ],
     "strategic_checklist.no_go_count": 0
+  },
+  "7c9d9c6e": {
+    "go_nogo.score": 78,
+    "timeline": [
+      {
+        "milestone": "June 5, 2026: RFP Issue Date",
+        "date_reference": ""
+      },
+      {
+        "milestone": "June 16, 2026, NLT 2:00 PM EST: Deadline for submission of inquiries and questions to Janis Hall",
+        "date_reference": ""
+      },
+      {
+        "milestone": "July 7, 2026, NLT 2:00 PM Local Time: Proposal Due Date and Time (Time-stamped 2:01 PM or later will not be accepted)",
+        "date_reference": ""
+      },
+      {
+        "milestone": "120 Days: Proposal binding period from the due date",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Quarterly (October 10, January 10, April 10, July 10): Deadline for submitting SWAM utilization reports",
+        "date_reference": ""
+      },
+      {
+        "milestone": "Semi-Annually: Deadline for submitting cooperative procurement usage reports",
+        "date_reference": ""
+      },
+      {
+        "milestone": "90 Days prior to expiration: Written notice of ODU's intention to renew the contract",
+        "date_reference": ""
+      }
+    ],
+    "strategic_checklist.no_go_count": 1
   }
 }
